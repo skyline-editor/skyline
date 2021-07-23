@@ -9,6 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@codemirror/basic-setup": "^0.18.2",
+    "@codemirror/lang-markdown": "^0.18.4",
+    "@codemirror/state": "^0.18.7",
+    "@codemirror/theme-one-dark": "^0.18.1",
+    "@codemirror/view": "^0.18.19",
     "@tauri-apps/api": "^1.0.0-beta.5",
     "next": "11.0.1",
     "react": "17.0.2",
