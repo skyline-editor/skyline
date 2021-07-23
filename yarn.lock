@@ -139,7 +139,7 @@
     "@codemirror/state" "^0.18.0"
     "@codemirror/view" "^0.18.0"
 
-"@codemirror/highlight@^0.18.0", "@codemirror/highlight@^0.18.4":
+"@codemirror/highlight@^0.18.0", "@codemirror/highlight@^0.18.3", "@codemirror/highlight@^0.18.4":
   version "0.18.4"
   resolved "https://registry.yarnpkg.com/@codemirror/highlight/-/highlight-0.18.4.tgz#83dfd402d7cbfe67dc9d0cb93a25755321014829"
   integrity sha512-3azJntqWrShOIq/0kVcdMc9k7ACL0LQErgK+A6aWXmCj5Mx0gShq+Iajy8AMQ2zB0v3nhCBgFaniL1LLD5m5hQ==
@@ -209,6 +209,15 @@
     "@codemirror/view" "^0.18.0"
     lezer-markdown "^0.14.3"
     lezer-tree "^0.13.0"
+
+"@codemirror/lang-python@^0.18.1":
+  version "0.18.1"
+  resolved "https://registry.yarnpkg.com/@codemirror/lang-python/-/lang-python-0.18.1.tgz#0fe6b23a0b46f223d956151ad9d69b3f356e4f94"
+  integrity sha512-qvlacd/sVb7ZZ4wTkOyWDL2P/OU98peChCvZRNyk8+w4bLHWfljoJRmiTGpZCdiwQtPq4IkEOl+xC/K8W0Sqig==
+  dependencies:
+    "@codemirror/highlight" "^0.18.0"
+    "@codemirror/language" "^0.18.0"
+    lezer-python "^0.13.0"
 
 "@codemirror/language@^0.18.0", "@codemirror/language@^0.18.1":
   version "0.18.2"
@@ -307,7 +316,7 @@
     "@codemirror/state" "^0.18.0"
     "@codemirror/view" "^0.18.0"
 
-"@codemirror/view@^0.18.0", "@codemirror/view@^0.18.19":
+"@codemirror/view@^0.18.0", "@codemirror/view@^0.18.11", "@codemirror/view@^0.18.19":
   version "0.18.19"
   resolved "https://registry.yarnpkg.com/@codemirror/view/-/view-0.18.19.tgz#9d4f943a9e79ae00f6ad2ace0d6c759624faa86f"
   integrity sha512-TmazVl8H3L+aYwlNb8xk6qADRb8KiYOO047pz51R4mGCg4Ja2siSjXktZgUvklsyWbUY7h9q+oAf4piH+mQZTw==
@@ -317,6 +326,15 @@
     "@codemirror/text" "^0.18.1"
     style-mod "^4.0.0"
     w3c-keyname "^2.2.4"
+
+"@ddietr/codemirror-themes@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@ddietr/codemirror-themes/-/codemirror-themes-1.0.2.tgz#8634bbb1e11c0fa0841c0338712491af3f70dca0"
+  integrity sha512-791lfGAn65fHRGK92Xi91NFZOarC1h6SpYvxvKZJIeOnJaNM/lfJqf0T6CV+KvGwMstMGwaLEYaVTLxGRI8NpA==
+  dependencies:
+    "@codemirror/highlight" "^0.18.3"
+    "@codemirror/state" "^0.18.7"
+    "@codemirror/view" "^0.18.11"
 
 "@eslint/eslintrc@^0.4.3":
   version "0.4.3"
@@ -3383,12 +3401,19 @@ lezer-markdown@^0.14.3:
     lezer-html "^0.13.0"
     lezer-tree "^0.13.0"
 
+lezer-python@^0.13.0:
+  version "0.13.7"
+  resolved "https://registry.yarnpkg.com/lezer-python/-/lezer-python-0.13.7.tgz#cd895b0d910f3601e3b51c8ed45de5a580d5f642"
+  integrity sha512-IoUdd88Hj2rdzV74xis5/NLWe69+GRe8wTI1z8ZIl/0IbyMAWEEvSHzAKqBGNGTuBIpBaW+l8awbW4gSZqrjIw==
+  dependencies:
+    lezer "^0.13.2"
+
 lezer-tree@^0.13.0, lezer-tree@^0.13.2:
   version "0.13.2"
   resolved "https://registry.yarnpkg.com/lezer-tree/-/lezer-tree-0.13.2.tgz#00f4671309b15c27b131f637e430ce2d4d5f7065"
   integrity sha512-15ZxW8TxVNAOkHIo43Iouv4zbSkQQ5chQHBpwXcD2bBFz46RB4jYLEEww5l1V0xyIx9U2clSyyrLes+hAUFrGQ==
 
-lezer@^0.13.0, lezer@^0.13.3, lezer@^0.13.4:
+lezer@^0.13.0, lezer@^0.13.2, lezer@^0.13.3, lezer@^0.13.4:
   version "0.13.5"
   resolved "https://registry.yarnpkg.com/lezer/-/lezer-0.13.5.tgz#6000536bca7e24a5bd62e8cb4feff28b37e7dd8f"
   integrity sha512-cAiMQZGUo2BD8mpcz7Nv1TlKzWP7YIdIRrX41CiP5bk5t4GHxskOxWUx2iAOuHlz8dO+ivbuXr0J1bfHsWD+lQ==

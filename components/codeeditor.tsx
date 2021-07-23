@@ -2,11 +2,12 @@
 
 import React, { useRef, useEffect, useState } from 'react'
 
-import { EditorView, ViewUpdate } from '@codemirror/view'
+import { EditorView, keymap, ViewUpdate } from '@codemirror/view'
 import { EditorState } from '@codemirror/state'
 import { basicSetup } from '@codemirror/basic-setup'
-import { markdown } from '@codemirror/lang-markdown'
+import { javascript } from '@codemirror/lang-javascript'
 import { oneDark } from '@codemirror/theme-one-dark'
+import { defaultTabBinding } from '@codemirror/commands'
 
 const CodeEditor: React.FC<{ initialValue: string }> = ({ initialValue }) => {
   // Local state
@@ -57,7 +58,13 @@ const CodeEditor: React.FC<{ initialValue: string }> = ({ initialValue }) => {
     editor.current = new EditorView({
       state: EditorState.create({
         doc: initialValue,
-        extensions: [basicSetup, markdown(), oneDark, onUpdate()],
+        extensions: [
+          basicSetup,
+          keymap.of([defaultTabBinding]),
+          javascript(),
+          oneDark,
+          onUpdate(),
+        ],
       }),
       parent: el as Element,
     })
@@ -82,13 +89,14 @@ const CodeEditor: React.FC<{ initialValue: string }> = ({ initialValue }) => {
   )
 
   return (
-    <div className="grid gap-8">
-      <div className="grid grid-cols-2 gap-5">
-        <div id="codemirror-editor-wrapper" />
-        <OutputText />
-      </div>
-      <OutputArray />
-    </div>
+    <div
+      id="codemirror-editor-wrapper"
+      style={{
+        marginLeft: 0,
+        marginRight: 0,
+        width: '98.5vw',
+      }}
+    />
   )
 }
 
