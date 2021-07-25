@@ -11,7 +11,10 @@ export default function Home() {
       </Head>
 
       {/* Code Editor */}
-      <CodeEditor initialValue="" />
+      <CodeEditor
+        initialValue="# This program prints Hello, world!
+print('Hello, world!')"
+      />
     </div>
   )
 }
