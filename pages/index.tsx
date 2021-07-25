@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 
-import CodeEditor from '../components/codeeditor'
+import CodeEditor from '../components/codeEditor'
 
 export default function Home() {
   return (
