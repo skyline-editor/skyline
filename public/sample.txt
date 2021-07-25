@@ -1,0 +1,15 @@
+/*
+multiline comment
+yay it works
+*/
+
+null
+undefined
+
+// greet the user
+import { greet } from 'hello'
+const hello = () => {
+  let a = true
+  let b = 35.2
+  console.lo
+}
