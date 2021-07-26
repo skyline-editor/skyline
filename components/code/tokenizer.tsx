@@ -1,5 +1,5 @@
 export interface ValueToken {
-  type: 'string' | 'number' | 'boolean' | 'keyword' | 'variable' | 'comment' | 'static';
+  type: 'string' | 'number' | 'boolean' | 'keyword' | 'variable' | 'comment' | 'static' | 'operator';
   value: string;
 }
 export interface ArrayToken {
@@ -13,8 +13,8 @@ const BOOLEAN = (value: string) => ({ type: 'boolean', value }) as ValueToken;
 const KEYWORD = (value: string) => ({ type: 'keyword', value }) as ValueToken;
 const VARIABLE = (value: string) => ({ type: 'variable', value }) as ValueToken;
 const COMMENT = (value: string) => ({ type: 'comment', value }) as ValueToken;
-
 const STATIC = (value: string) => ({ type: 'static', value }) as ValueToken;
+const OPERATOR = (value: string) => ({ type: 'operator', value }) as ValueToken;
 
 const PARENTHESES = (value: Token[]) => ({ type: 'parentheses', value }) as ArrayToken;
 const BRACKETS = (value: Token[]) => ({ type: 'brackets', value }) as ArrayToken;
@@ -23,13 +23,14 @@ const BRACES = (value: Token[]) => ({ type: 'braces', value }) as ArrayToken;
 export type Token = ValueToken | ArrayToken | string;
 
 const colors = {
-  string: '#F1FA8C',
-  number: '#FF4242',
-  boolean: '#508BFF',
-  static: '#508BFF',
-  keyword: '#FF79C6',
-  variable: '#50FA7B',
-  comment: '#555555',
+  string: '#C9FFD8',
+  number: '#E1C9FF',
+  operator: '#FF79C6',
+  boolean: '#9A92FF',
+  static: '#9A92FF',
+  keyword: '#79CFFF',
+  variable: '#83ADFF',
+  comment: '#57778F',
 };
 
 let list_id = 0;
@@ -85,6 +86,14 @@ const breaking_chars = [
   // non visibles
   ' ',
   '\n',
+  '\r'
+];
+
+const invisible = [
+  ' ',
+  '\n',
+  '\r',
+  '\t'
 ];
 
 const strings = [
@@ -96,9 +105,39 @@ const keywords = [
   'import',
   'from',
   'const',
-  '=',
-  '=>',
   'let',
+  'var',
+  'function',
+  'class',
+  'extends',
+  'return',
+  'if',
+  'else',
+  'while',
+  'for',
+  'with',
+  'break',
+  'continue',
+  'switch',
+  'case',
+  'default',
+  'try',
+  'catch',
+  'finally',
+  'throw',
+  'delete',
+  'typeof',
+  'instanceof',
+  'in',
+  'of',
+  'await',
+  'yield',
+  'await',
+  'async',
+  'as',
+  'export',
+  'type',
+  'interface'
 ];
 const brackets = [
   '{',
@@ -108,6 +147,25 @@ const brackets = [
 const statics = [
   'null',
   'undefined'
+];
+const operators = [
+  '=',
+  '=>',
+  '+',
+  '-',
+  '*',
+  '/',
+  '%',
+  '&',
+  '|',
+  '^',
+  '!',
+  '~',
+];
+
+const blank_vars = [
+  'var',
+  'let',
 ];
 
 interface RawToken {
@@ -233,6 +291,23 @@ export function tokenize(code: string) {
       }
     }
 
+    if (blank_vars.includes(token.value)) {
+      new_tokens.push(KEYWORD(token.value));
+      const between: string[] = [];
+
+      while (tokens[i + 1] && invisible.includes(tokens[i + 1].value)) {
+        between.push(tokens[i + 1].value);
+        i++;
+      }
+      
+      new_tokens.push(...between);
+      if (!/\W/g.test(tokens[i + 1].value)) {
+        new_tokens.push(tokens[i + 1].value);
+        i++;
+      }
+      continue;
+    }
+
     const keyword = keywords.map(v => {
       let total = '';
       let j = 0;
@@ -243,8 +318,22 @@ export function tokenize(code: string) {
       }
       return null;
     }).filter(v => v).sort((a, b) => b[0].length - a[0].length)[0];
+    const operator = operators.map(v => {
+      let total = '';
+      let j = 0;
+      while (v.startsWith(total) && total.length <= v.length && tokens.length > i + j) {
+        total += tokens[i + j].value;
+        if (total == v) return [v, j] as [string, number];
+        j++;
+      }
+      return null;
+    }).filter(v => v).sort((a, b) => b[0].length - a[0].length)[0];
 
-    if (keyword) {
+    if (operator && operator[0].length > (keyword?.[0].length || 0)) {
+      new_tokens.push(OPERATOR(operator[0]));
+      i += operator[1];
+      continue;
+    } else if (keyword) {
       new_tokens.push(KEYWORD(keyword[0]));
       i += keyword[1];
       continue;
@@ -272,6 +361,7 @@ export function tokenize(code: string) {
 
     if (token.value == '.') {
       const next_token = tokens[i + 1];
+      console.log(next_token);
       if (next_token && !/\D/g.test(next_token.value)) new_tokens.push(NUMBER(token.value)); else new_tokens.push(KEYWORD(token.value));
       continue;
     }
