@@ -1,6 +1,11 @@
 @font-face {
   font-family: 'Consolas';
-  src: url('../public/consolas.ttf');
+  src: url('../public/fonts/consolas.ttf');
+}
+
+@font-face {
+  font-family: 'Consolas Ligaturized';
+  src: url('../public/fonts/consolas_ligaturized_v2.ttf');
 }
 
 html,
