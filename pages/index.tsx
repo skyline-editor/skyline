@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 
-import CodeEditor from '../components/codeEditor'
+import CodeEditor from '../components/codeeditor'
 
 export default function Home() {
   return (
@@ -11,10 +11,16 @@ export default function Home() {
       </Head>
 
       {/* Code Editor */}
-      <CodeEditor
-        initialValue="# This program prints Hello, world!
+      <div className={styles.editor}>
+        <div className={styles.navbar}></div>
+        <div className={styles.sidebar}></div>
+        <div className={styles.code}>
+          <CodeEditor
+            initialValue="# This program prints Hello, world!
 print('Hello, world!')"
-      />
+          />
+        </div>
+      </div>
     </div>
   )
 }
