@@ -82,7 +82,8 @@ const CodeEditor: React.FC<{ initialValue: string }> = ({ initialValue }) => {
         position: 'absolute',
         left: '0',
         width: '100vw',
-        height: '300px',
+        height: '100%',
+        background: '#1c1e26',
       }}
     />
   )
