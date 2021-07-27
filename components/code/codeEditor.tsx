@@ -54,6 +54,20 @@ function moveCursor(code: string, cursor: Cursor, change: Cursor) : Cursor {
   };
 }
 
+function moveCursors(code: string, cursors: Cursor[], change: Cursor) : Cursor[] {
+  cursors = cursors.map(cursor => moveCursor(code, cursor, change));
+  cursors = cursors.filter((cursor, i) => {
+    cursor = validateCursor(code, cursor);
+    return !cursors.find((v, j) => {
+      v = validateCursor(code, v);
+      if (i >= j) return false;
+      return v.line === cursor.line && v.column === cursor.column
+    });
+  });
+
+  return cursors;
+}
+
 
 
 function validateCursorSome(code: string, cursor: Cursor, change: { line?: boolean, column?: boolean}) : Cursor {
@@ -99,7 +113,7 @@ const write_modes = {
   'Enter': ['insert', '\n'],
 } as {[key: string]: write_mode};
 
-function addText(code: string, key: string, cursor: Cursor) : { code: string, cursor: Cursor } {
+function addTextCursor(code: string, key: string, cursor: Cursor) : { code: string, cursor: Cursor } {
   if (key.length > 1 && !(key in write_modes)) return { code, cursor };
   let [mode, ...args] = ['insert', key] as write_mode;
   if (key in write_modes) [mode, ...args] = write_modes[key];
@@ -152,27 +166,82 @@ function addText(code: string, key: string, cursor: Cursor) : { code: string, cu
   code = lines.join('\n');
   return { code, cursor };
 }
+function addText(code: string, key: string, cursors: Cursor[]) : { code: string, cursors: Cursor[] } {
+  return { code, cursors };
+  /*
+  if (key.length > 1 && !(key in write_modes)) return { code, cursors };
+  let [mode, ...args] = ['insert', key] as write_mode;
+  if (key in write_modes) [mode, ...args] = write_modes[key];
 
-const state = { cursor: null, code: null };
+  cursor = validateCursorSome(code, cursor, { column: true });
+
+  const lines = code.split('\n');
+  const line = lines[cursor.line];
+  const column = cursor.column;
+
+  if (mode === 'delete') {
+    if (cursor.column < 1) {
+      if (cursor.line > 0) {
+        const lineText = lines[cursor.line - 1];
+        const lineEnd = line;
+
+        const newLine = lineText + lineEnd;
+        lines.splice(cursor.line - 1, 2, newLine);
+
+        cursor.line--;
+        cursor.column = lineText.length;
+      }
+    } else {
+      const lineText = line.substring(0, column - 1);
+      const lineEnd = line.substring(column);
+
+      const newLine = lineText + lineEnd;
+      lines.splice(cursor.line, 1, newLine);
+
+      cursor.column--;
+    }
+  }
+  if (mode === 'insert') {
+    const text = args[0] as string;
+
+    const lineText = line.substring(0, column);
+    const lineEnd = line.substring(column);
+
+    const newLine = lineText + text + lineEnd;
+    lines.splice(cursor.line, 1, newLine);
+
+    if (text === '\n') {
+      cursor.line++;
+      cursor.column = 0;
+    } else {
+      cursor.column += text.length;
+    }
+  }
+  
+  code = lines.join('\n');
+  return { code, cursor };
+  */
+}
+
+const state = { cursors: null, code: null };
 
 export const CodeEditor = ({
   initialValue,
 }) => {
   const [code, setCode] = useState(initialValue);
-  const [cursor, setCursor] = useState({
-    line: 7,
-    column: 1,
-  });
+  const [cursors, setCursors] = useState<Cursor[]>([]);
 
 
-  state.cursor = cursor;
+  state.cursors = cursors;
   state.code = code;
 
   useEffect(() => {
+    window.addEventListener('blur', e => {
+      setCursors([]);
+    });
     window.addEventListener('keydown', e => {
-      console.log(e.key, state.cursor);
       if (e.key === 'ArrowDown') {
-        setCursor(moveCursor(state.code, state.cursor, {
+        setCursors(moveCursors(state.code, state.cursors, {
           line: 1,
           column: 0,
         }));
@@ -180,7 +249,7 @@ export const CodeEditor = ({
         return;
       }
       if (e.key === 'ArrowUp') {
-        setCursor(moveCursor(state.code, state.cursor, {
+        setCursors(moveCursors(state.code, state.cursors, {
           line: -1,
           column: 0,
         }));
@@ -188,7 +257,7 @@ export const CodeEditor = ({
         return;
       }
       if (e.key === 'ArrowLeft') {
-        setCursor(moveCursor(state.code, state.cursor, {
+        setCursors(moveCursors(state.code, state.cursors, {
           line: 0,
           column: -1,
         }));
@@ -196,8 +265,7 @@ export const CodeEditor = ({
         return;
       }
       if (e.key === 'ArrowRight') {
-        console.log(state.cursor, state.code);
-        setCursor(moveCursor(state.code, state.cursor, {
+        setCursors(moveCursors(state.code, state.cursors, {
           line: 0,
           column: 1,
         }));
@@ -205,9 +273,9 @@ export const CodeEditor = ({
         return;
       }
 
-      const { code, cursor } = addText(state.code, e.key, state.cursor);
+      const { code, cursors } = addText(state.code, e.key, state.cursors);
       
-      setCursor(cursor);
+      setCursors(cursors);
       setCode(code);
     });
   }, []);
@@ -227,12 +295,26 @@ export const CodeEditor = ({
           column: Math.floor(x / Char.width),
         };
 
-        console.log(cursor);
-        setCursor(cursor);
+        let new_cursors = cursors.slice();
+        if (e.ctrlKey) {
+          new_cursors.push(cursor);
+        } else {
+          new_cursors = [cursor];
+        }
+
+        new_cursors = new_cursors.filter((cursor, i) => {
+          cursor = validateCursor(code, cursor);
+          return !new_cursors.find((v, j) => {
+            v = validateCursor(code, v);
+            if (i === j) return false;
+            return v.line === cursor.line && v.column === cursor.column
+          });
+        });
+        setCursors(new_cursors);
       }}
     >
       <Code code={code} />
-      <Cursors cursor={validateCursor(code, cursor)} />
+      <Cursors cursors={cursors.map(cursor => validateCursor(code, cursor))} />
     </div>
   );
 }
@@ -251,7 +333,17 @@ const Code: React.FC<{ code: string }> = ({ code }) => {
     </div>
   );
 };
-const Cursors = ({ cursor }: {cursor: Cursor}) => {
+const Cursors = ({ cursors }: {cursors: Cursor[]}) => {
+  return (
+    <div>
+      {cursors.map(cursor => (
+        <Cursor cursor={cursor} key={list_id++} />
+      ))}
+    </div>
+  );
+};
+
+const Cursor = ({ cursor }: {cursor: Cursor}) => {
   const [blink, setBlink] = useState(false);
 
   useEffect(() => {
@@ -263,9 +355,7 @@ const Cursors = ({ cursor }: {cursor: Cursor}) => {
   }, [blink]);
 
   return (
-    <div>
-      <div className={blink ? styles.cursor : styles.cursor_blink} style={{ top: Char.height * cursor.line, left: Char.width * cursor.column }} />
-    </div>
+    <div className={blink ? styles.cursor : styles.cursor_blink} style={{ top: Char.height * cursor.line, left: Char.width * cursor.column }} />
   );
 };
 
