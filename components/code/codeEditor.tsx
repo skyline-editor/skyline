@@ -71,15 +71,12 @@ function moveCursors(code: string, cursors: Cursor[], change: Cursor) : Cursor[]
 
 
 function validateCursorSome(code: string, cursor: Cursor, change: { line?: boolean, column?: boolean}) : Cursor {
-  const validated = validateCursor(code, {
-    line: cursor.line,
-    column: cursor.column
-  });
+  const validated = validateCursor(code, cursor);
 
-  return {
-    line: change.line ? validated.line : cursor.line,
-    column: change.column ? validated.column : cursor.column,
-  };
+  cursor.line = change.line ? validated.line : cursor.line;
+  cursor.column = change.column ? validated.column : cursor.column;
+
+  return cursor;
 }
 
 function validateCursor(code: string, cursor: Cursor) : Cursor {
@@ -93,6 +90,50 @@ function validateCursor(code: string, cursor: Cursor) : Cursor {
   
   if (column < 0) column = 0;
   if (column > lines[line].length) column = lines[line].length;
+
+  return {
+    line,
+    column,
+  };
+}
+function offsetCursor(code: string, cursor: Cursor, offset: number) : Cursor {
+  const lines = code.split('\n');
+
+  let line = cursor.line;
+  let column = cursor.column + offset;
+
+  let validated = false;
+  while (!validated) {
+    validated = true;
+    if (line < 0) {
+      line = 0;
+      column = 0;
+
+      validated = false;
+    }
+    if (line >= lines.length) {
+      line = lines.length - 1;
+      column = lines[line].length;
+
+      validated = false;
+    }
+    
+    if (column < 0) {
+      line--;
+      column = lines[line].length + column;
+
+      validated = false;
+    }
+    if (column > lines[line].length) {
+      line++;
+      column -= lines[line].length;
+
+      validated = false;
+    }
+  }
+
+  cursor.line = line;
+  cursor.column = column;
 
   return {
     line,
@@ -113,8 +154,8 @@ const write_modes = {
   'Enter': ['insert', '\n'],
 } as {[key: string]: write_mode};
 
-function addTextCursor(code: string, key: string, cursor: Cursor) : { code: string, cursor: Cursor } {
-  if (key.length > 1 && !(key in write_modes)) return { code, cursor };
+function addTextCursor(code: string, key: string, cursor: Cursor, affected: Cursor[]) : string {
+  if (key.length > 1 && !(key in write_modes)) return code;
   let [mode, ...args] = ['insert', key] as write_mode;
   if (key in write_modes) [mode, ...args] = write_modes[key];
 
@@ -135,6 +176,7 @@ function addTextCursor(code: string, key: string, cursor: Cursor) : { code: stri
 
         cursor.line--;
         cursor.column = lineText.length;
+        affected.map(v => v.line -= 1);
       }
     } else {
       const lineText = line.substring(0, column - 1);
@@ -144,6 +186,7 @@ function addTextCursor(code: string, key: string, cursor: Cursor) : { code: stri
       lines.splice(cursor.line, 1, newLine);
 
       cursor.column--;
+      affected.map(v => v.column += v.line === cursor.line ? -1 : 0);
     }
   }
   if (mode === 'insert') {
@@ -161,66 +204,39 @@ function addTextCursor(code: string, key: string, cursor: Cursor) : { code: stri
     } else {
       cursor.column += text.length;
     }
+
+    affected.map(v => v.column += v.line === cursor.line ? text.length : 0);
   }
   
-  code = lines.join('\n');
-  return { code, cursor };
+  return lines.join('\n');
 }
 function addText(code: string, key: string, cursors: Cursor[]) : { code: string, cursors: Cursor[] } {
-  return { code, cursors };
-  /*
-  if (key.length > 1 && !(key in write_modes)) return { code, cursors };
-  let [mode, ...args] = ['insert', key] as write_mode;
-  if (key in write_modes) [mode, ...args] = write_modes[key];
+  cursors = cursors.sort((a, b) => {
+    if (a.line < b.line) return -1;
+    if (a.line > b.line) return 1;
+    if (a.column < b.column) return -1;
+    if (a.column > b.column) return 1;
+    return 0;
+  });
 
-  cursor = validateCursorSome(code, cursor, { column: true });
-
-  const lines = code.split('\n');
-  const line = lines[cursor.line];
-  const column = cursor.column;
-
-  if (mode === 'delete') {
-    if (cursor.column < 1) {
-      if (cursor.line > 0) {
-        const lineText = lines[cursor.line - 1];
-        const lineEnd = line;
-
-        const newLine = lineText + lineEnd;
-        lines.splice(cursor.line - 1, 2, newLine);
-
-        cursor.line--;
-        cursor.column = lineText.length;
-      }
-    } else {
-      const lineText = line.substring(0, column - 1);
-      const lineEnd = line.substring(column);
-
-      const newLine = lineText + lineEnd;
-      lines.splice(cursor.line, 1, newLine);
-
-      cursor.column--;
-    }
+  for (let i = 0; i < cursors.length; i++) {
+    const cursor = cursors[i];
+    code = addTextCursor(code, key, cursor, cursors.slice(i + 1));
   }
-  if (mode === 'insert') {
-    const text = args[0] as string;
 
-    const lineText = line.substring(0, column);
-    const lineEnd = line.substring(column);
+  cursors = cursors.filter((cursor, i) => {
+    cursor = validateCursor(code, cursor);
+    return !cursors.find((v, j) => {
+      v = validateCursor(code, v);
+      if (i >= j) return false;
+      return v.line === cursor.line && v.column === cursor.column
+    });
+  });
 
-    const newLine = lineText + text + lineEnd;
-    lines.splice(cursor.line, 1, newLine);
-
-    if (text === '\n') {
-      cursor.line++;
-      cursor.column = 0;
-    } else {
-      cursor.column += text.length;
-    }
-  }
-  
-  code = lines.join('\n');
-  return { code, cursor };
-  */
+  return {
+    code,
+    cursors,
+  };
 }
 
 const state = { cursors: null, code: null };
@@ -240,43 +256,87 @@ export const CodeEditor = ({
       setCursors([]);
     });
     window.addEventListener('keydown', e => {
-      if (e.key === 'ArrowDown') {
-        setCursors(moveCursors(state.code, state.cursors, {
-          line: 1,
-          column: 0,
-        }));
-        e.preventDefault();
-        return;
-      }
-      if (e.key === 'ArrowUp') {
-        setCursors(moveCursors(state.code, state.cursors, {
-          line: -1,
-          column: 0,
-        }));
-        e.preventDefault();
-        return;
-      }
-      if (e.key === 'ArrowLeft') {
-        setCursors(moveCursors(state.code, state.cursors, {
-          line: 0,
-          column: -1,
-        }));
-        e.preventDefault();
-        return;
-      }
-      if (e.key === 'ArrowRight') {
-        setCursors(moveCursors(state.code, state.cursors, {
-          line: 0,
-          column: 1,
-        }));
-        e.preventDefault();
-        return;
-      }
+      if (state.cursors.length < 1) return;
 
-      const { code, cursors } = addText(state.code, e.key, state.cursors);
+      if (e.key === 'Escape' || e.key === 'Esc') setCursors(state.cursors.slice(0, 1));
+
+      if (e.ctrlKey && e.altKey && !e.metaKey && !e.shiftKey) {
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          
+          const new_cursors = state.cursors.slice();
+          const last_cursor = new_cursors.reduce((acc, v) => {
+            if (v.line === acc.line) return v.column > acc.column ? v : acc;
+            return v.line > acc.line ? v : acc;
+          }, new_cursors[0])
+          
+          if (last_cursor.line >= code.split('\n').length - 1) return;
+          new_cursors.push({
+            line: last_cursor.line + 1,
+            column: last_cursor.column,
+          });
+          
+          setCursors(new_cursors);
+          return;
+        }
+        if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          
+          const new_cursors = state.cursors.slice();
+          const first_cursor = new_cursors.reduce((acc, v) => {
+            if (v.line === acc.line) return v.column < acc.column ? v : acc;
+            return v.line < acc.line ? v : acc;
+          }, new_cursors[0])
+
+          if (first_cursor.line < 1) return;
+          new_cursors.push({
+            line: first_cursor.line - 1,
+            column: first_cursor.column,
+          });
+
+          setCursors(new_cursors);
+          return;
+        }
+      }
+      if (!e.ctrlKey && !e.altKey) {
+        if (e.key === 'ArrowDown') {
+          setCursors(moveCursors(state.code, state.cursors, {
+            line: 1,
+            column: 0,
+          }));
+          e.preventDefault();
+          return;
+        }
+        if (e.key === 'ArrowUp') {
+          setCursors(moveCursors(state.code, state.cursors, {
+            line: -1,
+            column: 0,
+          }));
+          e.preventDefault();
+          return;
+        }
+        if (e.key === 'ArrowLeft') {
+          setCursors(moveCursors(state.code, state.cursors, {
+            line: 0,
+            column: -1,
+          }));
+          e.preventDefault();
+          return;
+        }
+        if (e.key === 'ArrowRight') {
+          setCursors(moveCursors(state.code, state.cursors, {
+            line: 0,
+            column: 1,
+          }));
+          e.preventDefault();
+          return;
+        }
+
+        const { code, cursors } = addText(state.code, e.key, state.cursors);
       
-      setCursors(cursors);
-      setCode(code);
+        setCursors(cursors);
+        setCode(code);
+      }
     });
   }, []);
   
@@ -351,7 +411,13 @@ const Cursor = ({ cursor }: {cursor: Cursor}) => {
   }, [cursor]);
 
   useEffect(() => {
-    if (blink) setTimeout(() => setBlink(false), 100);
+    if (blink) {
+      const timeout = setTimeout(() => setBlink(false), 100);
+
+      return () => {
+        clearTimeout(timeout);
+      }
+    }
   }, [blink]);
 
   return (
