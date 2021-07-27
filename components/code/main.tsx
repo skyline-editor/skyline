@@ -8,7 +8,7 @@ export default function Main() {
 
   useEffect(() => {
     fetch("/sample.txt").then(r => r.text()).then(v => {
-      setDefaultCode(v);
+      setDefaultCode(v.split('\r').join(''));
       setLoaded(true);
     });
   }, []);
