@@ -118,13 +118,13 @@ const breaking_chars = [
   // non visibles
   ' ',
   '\n',
-  '\r'
+  ''
 ];
 
 const invisible = [
   ' ',
   '\n',
-  '\r',
+  '',
   '\t'
 ];
 
