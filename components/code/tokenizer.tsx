@@ -77,9 +77,9 @@ function getElemsFromTokens(tokens: Token[]) {
 
     if (typeof token.value !== 'string') {
       const code = getElemsFromTokens(token.value);
-      if (token.type === 'parentheses') elems.push('(', ...code, ')');
-      if (token.type === 'brackets') elems.push('{', ...code, '}');
-      if (token.type === 'braces') elems.push('[', ...code, ']');
+      if (token.type === 'parentheses') elems.push(...code);
+      if (token.type === 'brackets') elems.push(...code);
+      if (token.type === 'braces') elems.push(...code);
       continue;
     }
     elems.push(token.value);
@@ -279,6 +279,7 @@ export function tokenize(code: string) {
       if (token === ']') new_tokens.push(BRACES(value, pos));
       if (token === '}') new_tokens.push(BRACKETS(value, pos));
 
+      new_tokens.push(token);
       continue;
     }
 
@@ -287,6 +288,8 @@ export function tokenize(code: string) {
       if (token === '(') closing = ')';
       if (token === '[') closing = ']';
       if (token === '{') closing = '}';
+
+      new_tokens.push(token);
 
       env.brackets.push({
         value: token,

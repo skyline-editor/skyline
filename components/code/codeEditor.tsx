@@ -38,13 +38,23 @@ function moveCursor(code: string, cursor: Cursor, change: Cursor) : Cursor {
     column = validated.column + change.column;
     if (column < 0) {
       line--;
-      if (line < 0) line = 0;
-      column = lines[line].length;
+
+      if (line < 0) {
+        line = 0;
+        column = 0;
+      } else {
+        column = lines[line].length;
+      }
     }
     if (column > lines[line].length) {
       line++;
-      if (line >= lines.length) line = lines.length - 1;
-      column = 0;
+
+      if (line >= lines.length) {
+        line = lines.length - 1;
+        column = lines[line].length;
+      } else {
+        column = 0;
+      }
     }
   }
 
@@ -90,50 +100,6 @@ function validateCursor(code: string, cursor: Cursor) : Cursor {
   
   if (column < 0) column = 0;
   if (column > lines[line].length) column = lines[line].length;
-
-  return {
-    line,
-    column,
-  };
-}
-function offsetCursor(code: string, cursor: Cursor, offset: number) : Cursor {
-  const lines = code.split('\n');
-
-  let line = cursor.line;
-  let column = cursor.column + offset;
-
-  let validated = false;
-  while (!validated) {
-    validated = true;
-    if (line < 0) {
-      line = 0;
-      column = 0;
-
-      validated = false;
-    }
-    if (line >= lines.length) {
-      line = lines.length - 1;
-      column = lines[line].length;
-
-      validated = false;
-    }
-    
-    if (column < 0) {
-      line--;
-      column = lines[line].length + column;
-
-      validated = false;
-    }
-    if (column > lines[line].length) {
-      line++;
-      column -= lines[line].length;
-
-      validated = false;
-    }
-  }
-
-  cursor.line = line;
-  cursor.column = column;
 
   return {
     line,
@@ -260,6 +226,8 @@ export const CodeEditor = ({
 
       if (e.key === 'Escape' || e.key === 'Esc') setCursors(state.cursors.slice(0, 1));
 
+      if (e.key === 'Tab') e.preventDefault();
+
       if (e.ctrlKey && e.altKey && !e.metaKey && !e.shiftKey) {
         if (e.key === 'ArrowDown') {
           e.preventDefault();
@@ -350,10 +318,10 @@ export const CodeEditor = ({
         const x = e.clientX - editor.getBoundingClientRect().left;
         const y = e.clientY - editor.getBoundingClientRect().top;
 
-        const cursor = {
+        const cursor = validateCursor(code, {
           line: Math.floor(y / Char.height),
           column: Math.floor(x / Char.width),
-        };
+        });
 
         let new_cursors = cursors.slice();
         if (e.ctrlKey) {
