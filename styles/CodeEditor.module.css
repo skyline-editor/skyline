@@ -1,4 +1,5 @@
 .codeEditor {
+  position: relative;
   background-color: #1c1e26;
 
   width: 100%;
@@ -10,12 +11,30 @@
 
 .line {
   font-family: 'Consolas Ligaturized';
-  font-size: 19px;
+  font-size: 20px;
+  height: 20px;
   color: #f8f8f2;
 
   font-weight: 100;
-
   margin: 0;
-
   white-space: pre;
+}
+
+.cursor {
+  position: absolute;
+  width: 2px;
+  height: 20px;
+  z-index: 10;
+  background-color: #EE5078;
+
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  from, to {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
 }
