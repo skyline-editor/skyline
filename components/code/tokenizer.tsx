@@ -107,7 +107,6 @@ export function codeFromTokens(tokens: Token[]) {
 const invisible = [
   ' ',
   '\n',
-  '\r',
   '\t'
 ];
 
@@ -244,8 +243,8 @@ export function tokenize(code: string) {
         const value = code.substr(env.comment.pos, length);
         new_tokens.push(COMMENT(value, env.comment.pos));
         
+        pos -= tokens[i - 1].length;
         i--;
-        pos--;
         env.comment = null;
         continue;
       }
