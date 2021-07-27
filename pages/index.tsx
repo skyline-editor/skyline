@@ -13,7 +13,11 @@ export default function Home() {
       {/* Code Editor */}
       <div className={styles.editor}>
         <div className={styles.navbar}></div>
-        <div className={styles.sidebar}></div>
+        <div className={styles.sidebar}>
+          <button onClick={() => {
+            window.location.href = '/new';
+          }}>Got to new Code Editor (BETA)</button>
+        </div>
         <div className={styles.code}>
           <CodeEditor
             initialValue="# This program prints Hello, world!
