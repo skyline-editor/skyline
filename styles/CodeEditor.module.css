@@ -7,6 +7,9 @@
 
   overflow-y: auto;
   overflow-x: hidden;
+
+  user-select: none;
+  cursor: text;
 }
 
 .line {
@@ -18,9 +21,17 @@
   font-weight: 100;
   margin: 0;
   white-space: pre;
+  vertical-align: middle;
 }
 
 .cursor {
+  position: absolute;
+  width: 2px;
+  height: 20px;
+  z-index: 10;
+  background-color: #EE5078;
+}
+.cursor_blink {
   position: absolute;
   width: 2px;
   height: 20px;
