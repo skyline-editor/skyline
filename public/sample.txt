@@ -3,6 +3,18 @@ multiline comment
 yay it works
 */
 
+// 1 char
+A
+AB
+=>
+
+'add'
+'aa
+bb'
+`aa`
+`aa
+bb`
+
 null
 undefined
 
