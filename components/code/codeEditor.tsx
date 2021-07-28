@@ -157,11 +157,21 @@ function addTextCursor(code: string, key: string, cursor: Cursor, affected: Curs
   }
   if (mode === 'insert') {
     const text = args[0] as string;
+    let extra = '';
+    if (text === '(') extra = ')';
+    if (text === '{') extra = '}';
+    if (text === '[') extra = ']';
+    if (text === '<') extra = '>';
+    if (text === '"') extra = '"';
+    if (text === '\'') extra = '\'';
+    if (text === '`') extra = '`';
+
+    state.extra = extra;
 
     const lineText = line.substring(0, column);
     const lineEnd = line.substring(column);
 
-    const newLine = lineText + text + lineEnd;
+    const newLine = lineText + text + extra + lineEnd;
     lines.splice(cursor.line, 1, newLine);
 
     if (text === '\n') {
@@ -177,6 +187,18 @@ function addTextCursor(code: string, key: string, cursor: Cursor, affected: Curs
   return lines.join('\n');
 }
 function addText(code: string, key: string, cursors: Cursor[]) : { code: string, cursors: Cursor[] } {
+  if (key === state.extra) {
+    state.extra = '';
+
+    return {
+      code,
+      cursors: cursors.map(v => {
+        v.column++;
+        return v;
+      }),
+    };
+  }
+
   cursors = cursors.sort((a, b) => {
     if (a.line < b.line) return -1;
     if (a.line > b.line) return 1;
@@ -205,7 +227,7 @@ function addText(code: string, key: string, cursors: Cursor[]) : { code: string,
   };
 }
 
-const state = { cursors: null, code: null };
+const state = { cursors: [], code: '', extra: '' };
 
 export const CodeEditor = ({
   initialValue,
