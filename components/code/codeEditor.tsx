@@ -2,261 +2,37 @@ import React, { useEffect, useState } from "react";
 import styles from '../../styles/CodeEditor.module.css'
 import { highlight } from "./tokenizer";
 
+import { Cursor, validateCursor } from "./util/cursor";
+import { addText } from "./util/text";
+
+import moveShortcuts from './shortcuts/move';
+import copyLineShortcuts from './shortcuts/copyLine';
+import copyCursorShortcuts from './shortcuts/copyCursor';
+
 export interface CodeEditorProps {
   initialValue: string;
   onChange?: (code: string) => void;
 }
 
-interface Cursor {
-  line: number;
-  column: number;
-}
-
-const Char = {
+export const Char = {
   width: 11,
   height: 20,
 };
 
-function moveCursor(code: string, cursor: Cursor, change: Cursor) : Cursor {
-  const lines = code.split('\n');
+const state = { cursors: [], code: '' };
 
-  let line = cursor.line;
-  let column = cursor.column;
+export interface KeyboardShortcut {
+  key?: string;
+  ctrl?: boolean;
+  alt?: boolean;
+  shift?: boolean;
 
-  const validated = validateCursor(code, {
-    line: cursor.line,
-    column: cursor.column
-  });
-
-  if (change.line) {
-    line = validated.line + change.line;
-    if (line < 0) line = 0;
-    if (line >= lines.length) line = lines.length - 1;
-  }
-  
-  if (change.column) {
-    column = validated.column + change.column;
-    if (column < 0) {
-      line--;
-
-      if (line < 0) {
-        line = 0;
-        column = 0;
-      } else {
-        column = lines[line].length;
-      }
-    }
-    if (column > lines[line].length) {
-      line++;
-
-      if (line >= lines.length) {
-        line = lines.length - 1;
-        column = lines[line].length;
-      } else {
-        column = 0;
-      }
-    }
-  }
-
-  return {
-    line,
-    column,
-  };
+  name: string;
+  description?: string;
+  exec: (code: string, cursors: Cursor[], event: KeyboardEvent) => { code: string, cursors: Cursor[] } | undefined | null;
 }
 
-function moveCursors(code: string, cursors: Cursor[], change: Cursor) : Cursor[] {
-  cursors = cursors.map(cursor => moveCursor(code, cursor, change));
-  cursors = cursors.filter((cursor, i) => {
-    cursor = validateCursor(code, cursor);
-    return !cursors.find((v, j) => {
-      v = validateCursor(code, v);
-      if (i >= j) return false;
-      return v.line === cursor.line && v.column === cursor.column
-    });
-  });
-
-  return cursors;
-}
-
-
-
-function validateCursorSome(code: string, cursor: Cursor, change: { line?: boolean, column?: boolean}) : Cursor {
-  const validated = validateCursor(code, cursor);
-
-  cursor.line = change.line ? validated.line : cursor.line;
-  cursor.column = change.column ? validated.column : cursor.column;
-
-  return cursor;
-}
-
-function validateCursor(code: string, cursor: Cursor) : Cursor {
-  const lines = code.split('\n');
-
-  let line = cursor.line;
-  let column = cursor.column;
-
-  if (line < 0) line = 0;
-  if (line >= lines.length) line = lines.length - 1;
-  
-  if (column < 0) column = 0;
-  if (column > lines[line].length) column = lines[line].length;
-
-  return {
-    line,
-    column,
-  };
-}
-
-const tab_size = 2;
-
-type delete_mode = ['delete', number];
-type insert_mode = ['insert', string];
-type write_mode = delete_mode | insert_mode;
-
-const write_modes = {
-  'Backspace': ['delete', -1],
-  'Delete': ['delete', 1],
-  'Tab': ['insert', ' '.repeat(tab_size)],
-  'Enter': ['insert', '\n'],
-} as {[key: string]: write_mode};
-
-function addTextCursor(code: string, key: string, cursor: Cursor, affected: Cursor[]) : string {
-  if (key.length > 1 && !(key in write_modes)) return code;
-  let [mode, ...args] = ['insert', key] as write_mode;
-  if (key in write_modes) [mode, ...args] = write_modes[key];
-
-  cursor = validateCursorSome(code, cursor, { column: true });
-
-  const lines = code.split('\n');
-  const line = lines[cursor.line];
-  const column = cursor.column;
-
-  if (mode === 'delete') {
-    const direction = args[0] as number;
-
-    const back = Math.max(0, -direction);
-    const front = Math.max(0, direction);
-
-    const lineText = line.substring(0, column - back);
-    const lineEnd = line.substring(column + front);
-
-    if (cursor.column < back || cursor.column > line.length - front) {
-      if (back) {
-        if (cursor.line > 0) {
-          const lineText = lines[cursor.line - 1];
-          const lineEnd = line;
-  
-          const newLine = lineText + lineEnd;
-          lines.splice(cursor.line - 1, 2, newLine);
-  
-          cursor.line--;
-          cursor.column = lineText.length;
-          affected.map(v => {
-            if (v.line === cursor.line) v.column += lineText.length;
-            v.line -= 1;
-          });
-        }
-      }
-      if (front) {
-        if (cursor.line < lines.length - 1) {
-          const lineText = line;
-          const lineEnd = lines[cursor.line + 1];
-  
-          const newLine = lineText + lineEnd;
-          lines.splice(cursor.line, 2, newLine);
-
-          cursor.column = lineText.length;
-          affected.map(v => {
-            if (v.line === cursor.line + 1) v.column += lineText.length;
-            v.line -= 1;
-          });
-        }
-      }
-    } else {
-      const newLine = lineText + lineEnd;
-      lines.splice(cursor.line, 1, newLine);
-
-      cursor.column -= back;
-      affected.map(v => v.column += v.line === cursor.line ? -1 : 0);
-    }
-  }
-  if (mode === 'insert') {
-    const text = args[0] as string;
-    let extra = '';
-    if (text === '(') extra = ')';
-    if (text === '{') extra = '}';
-    if (text === '[') extra = ']';
-    if (text === '<') extra = '>';
-    if (text === '"') extra = '"';
-    if (text === '\'') extra = '\'';
-    if (text === '`') extra = '`';
-
-    state.extra = extra;
-
-    const lineText = line.substring(0, column);
-    const lineEnd = line.substring(column);
-
-    const newLine = lineText + text + extra + lineEnd;
-    lines.splice(cursor.line, 1, newLine);
-
-    if (text === '\n') {
-      cursor.line++;
-      cursor.column = 0;
-    } else {
-      cursor.column += text.length;
-    }
-
-    affected.map(v => {
-      if (text === '\n') return v.line++;
-      v.column += v.line === cursor.line ? text.length : 0
-    });
-  }
-  
-  return lines.join('\n');
-}
-function addText(code: string, key: string, cursors: Cursor[]) : { code: string, cursors: Cursor[] } {
-  if (key === state.extra) {
-    state.extra = '';
-
-    return {
-      code,
-      cursors: cursors.map(v => {
-        v.column++;
-        return v;
-      }),
-    };
-  }
-
-  cursors = cursors.sort((a, b) => {
-    if (a.line < b.line) return -1;
-    if (a.line > b.line) return 1;
-    if (a.column < b.column) return -1;
-    if (a.column > b.column) return 1;
-    return 0;
-  });
-
-  for (let i = 0; i < cursors.length; i++) {
-    const cursor = cursors[i];
-    code = addTextCursor(code, key, cursor, cursors.slice(i + 1));
-  }
-
-  cursors = cursors.filter((cursor, i) => {
-    cursor = validateCursor(code, cursor);
-    return !cursors.find((v, j) => {
-      v = validateCursor(code, v);
-      if (i >= j) return false;
-      return v.line === cursor.line && v.column === cursor.column
-    });
-  });
-
-  return {
-    code,
-    cursors,
-  };
-}
-
-const state = { cursors: [], code: '', extra: '' };
-
+const keyboardShortcuts: KeyboardShortcut[] = [];
 export const CodeEditor = ({
   initialValue,
 }) => {
@@ -274,153 +50,27 @@ export const CodeEditor = ({
     window.addEventListener('keydown', e => {
       if (state.cursors.length < 1) return;
 
-      if (e.key === 'Escape' || e.key === 'Esc') setCursors(state.cursors.slice(0, 1));
-      if (e.key === 'Tab') e.preventDefault();
-      if (e.key == 'l' && (e.ctrlKey || e.metaKey)) {
+      for (const keyboardShortcut of keyboardShortcuts) {
+        const { exec } = keyboardShortcut;
+        const { ctrl, alt, shift, key } = keyboardShortcut;
+
+        if (typeof key !== 'undefined' && e.key !== key) continue;
+        if (typeof ctrl !== 'undefined' && ctrl !== e.ctrlKey) continue;
+        if (typeof alt !== 'undefined' && alt !== e.altKey) continue;
+        if (typeof shift !== 'undefined' && shift !== e.shiftKey) continue;
+
+        const result = exec(state.code, state.cursors, e);
+        if (!result) continue;
+
         e.preventDefault();
+        
+        const { code, cursors } = result;
+        setCode(code);
+        setCursors(cursors);
         return;
       }
 
-      if (!e.ctrlKey && e.altKey && !e.metaKey && e.shiftKey) {
-        if (e.key === 'ArrowDown') {
-          e.preventDefault();
-
-          let cursors = state.cursors;
-          cursors = cursors.sort((a, b) => {
-            if (a.line < b.line) return -1;
-            if (a.line > b.line) return 1;
-            if (a.column < b.column) return -1;
-            if (a.column > b.column) return 1;
-            return 0;
-          });
-
-          const lines = state.code.split('\n');
-          let last = null;
-          for (let i = 0; i < state.cursors.length; i++) {
-            const cursor = cursors[i];
-            
-            if (last && last.line === cursor.line) continue;
-            last = cursor;
-
-            const affected = cursors.slice(i + 1);
-
-            const line = lines[cursor.line];
-            lines.splice(cursor.line, 0, line);
-
-            cursor.line++;
-            affected.map(v => v.line++);
-          }
-          
-          setCode(lines.join('\n'));
-          setCursors(cursors.slice());
-          return;
-        }
-        if (e.key === 'ArrowUp') {
-          e.preventDefault();
-
-          let cursors = state.cursors;
-          cursors = cursors.sort((a, b) => {
-            if (a.line < b.line) return -1;
-            if (a.line > b.line) return 1;
-            if (a.column < b.column) return -1;
-            if (a.column > b.column) return 1;
-            return 0;
-          });
-
-          const lines = state.code.split('\n');
-          let last = null;
-          for (let i = 0; i < state.cursors.length; i++) {
-            const cursor = cursors[i];
-
-            if (last && last.line === cursor.line) continue;
-            last = cursor;
-
-            const affected = cursors.slice(i + 1);
-
-            const line = lines[cursor.line];
-            lines.splice(cursor.line, 0, line);
-
-            affected.map(v => v.line += (v.line == cursor.line) ? 0 : 1);
-          }
-          
-          setCode(lines.join('\n'));
-          setCursors(cursors.slice());
-          return;
-        }
-      }
-
-      if (e.ctrlKey && e.altKey && !e.metaKey && !e.shiftKey) {
-        if (e.key === 'ArrowDown') {
-          e.preventDefault();
-          
-          const new_cursors = state.cursors.slice();
-          const last_cursor = new_cursors.reduce((acc, v) => {
-            if (v.line === acc.line) return v.column > acc.column ? v : acc;
-            return v.line > acc.line ? v : acc;
-          }, new_cursors[0])
-          
-          if (last_cursor.line >= code.split('\n').length - 1) return;
-          new_cursors.push({
-            line: last_cursor.line + 1,
-            column: last_cursor.column,
-          });
-          
-          setCursors(new_cursors);
-          return;
-        }
-        if (e.key === 'ArrowUp') {
-          e.preventDefault();
-          
-          const new_cursors = state.cursors.slice();
-          const first_cursor = new_cursors.reduce((acc, v) => {
-            if (v.line === acc.line) return v.column < acc.column ? v : acc;
-            return v.line < acc.line ? v : acc;
-          }, new_cursors[0])
-
-          if (first_cursor.line < 1) return;
-          new_cursors.push({
-            line: first_cursor.line - 1,
-            column: first_cursor.column,
-          });
-
-          setCursors(new_cursors);
-          return;
-        }
-      }
       if (!e.ctrlKey && !e.altKey) {
-        if (e.key === 'ArrowDown') {
-          setCursors(moveCursors(state.code, state.cursors, {
-            line: 1,
-            column: 0,
-          }));
-          e.preventDefault();
-          return;
-        }
-        if (e.key === 'ArrowUp') {
-          setCursors(moveCursors(state.code, state.cursors, {
-            line: -1,
-            column: 0,
-          }));
-          e.preventDefault();
-          return;
-        }
-        if (e.key === 'ArrowLeft') {
-          setCursors(moveCursors(state.code, state.cursors, {
-            line: 0,
-            column: -1,
-          }));
-          e.preventDefault();
-          return;
-        }
-        if (e.key === 'ArrowRight') {
-          setCursors(moveCursors(state.code, state.cursors, {
-            line: 0,
-            column: 1,
-          }));
-          e.preventDefault();
-          return;
-        }
-
         const { code, cursors } = addText(state.code, e.key, state.cursors);
       
         setCursors(cursors);
@@ -486,13 +136,13 @@ const Cursors = ({ cursors }: {cursors: Cursor[]}) => {
   return (
     <div>
       {cursors.map(cursor => (
-        <Cursor cursor={cursor} key={list_id++} />
+        <DisplayCursor cursor={cursor} key={list_id++} />
       ))}
     </div>
   );
 };
 
-const Cursor = ({ cursor }: {cursor: Cursor}) => {
+const DisplayCursor = ({ cursor }: {cursor: Cursor}) => {
   const [blink, setBlink] = useState(false);
 
   useEffect(() => {
@@ -515,3 +165,44 @@ const Cursor = ({ cursor }: {cursor: Cursor}) => {
 };
 
 export default CodeEditor;
+
+keyboardShortcuts.push(...moveShortcuts);
+keyboardShortcuts.push(...copyLineShortcuts);
+keyboardShortcuts.push(...copyCursorShortcuts);
+
+keyboardShortcuts.push({
+  name: 'Escape',
+  description: 'Clear all cursors except the first one',
+
+  key: 'Escape',
+  exec: (code, cursors) => {
+    return {
+      code,
+      cursors: cursors.slice(0, 1)
+    };
+  }
+});
+
+keyboardShortcuts.push({
+  name: 'Tab',
+  description: 'adds an tab',
+
+  key: 'Tab',
+  exec: (code, cursors) => {
+    return addText(code, 'Tab', cursors);
+  }
+});
+
+keyboardShortcuts.push({
+  name: 'Escape',
+  description: 'Clear all cursors except the first one',
+
+  key: 'l',
+  ctrl: true,
+  exec: (code, cursors) => {
+    return {
+      code,
+      cursors
+    };
+  }
+});
