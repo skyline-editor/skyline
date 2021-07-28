@@ -295,9 +295,13 @@ export const CodeEditor = ({
           });
 
           const lines = state.code.split('\n');
-
+          let last = null;
           for (let i = 0; i < state.cursors.length; i++) {
             const cursor = cursors[i];
+            
+            if (last && last.line === cursor.line) continue;
+            last = cursor;
+
             const affected = cursors.slice(i + 1);
 
             const line = lines[cursor.line];
@@ -324,9 +328,13 @@ export const CodeEditor = ({
           });
 
           const lines = state.code.split('\n');
-
+          let last = null;
           for (let i = 0; i < state.cursors.length; i++) {
             const cursor = cursors[i];
+
+            if (last && last.line === cursor.line) continue;
+            last = cursor;
+
             const affected = cursors.slice(i + 1);
 
             const line = lines[cursor.line];
