@@ -132,26 +132,51 @@ function addTextCursor(code: string, key: string, cursor: Cursor, affected: Curs
   const column = cursor.column;
 
   if (mode === 'delete') {
-    if (cursor.column < 1) {
-      if (cursor.line > 0) {
-        const lineText = lines[cursor.line - 1];
-        const lineEnd = line;
+    const direction = args[0] as number;
 
-        const newLine = lineText + lineEnd;
-        lines.splice(cursor.line - 1, 2, newLine);
+    const back = Math.max(0, -direction);
+    const front = Math.max(0, direction);
 
-        cursor.line--;
-        cursor.column = lineText.length;
-        affected.map(v => v.line -= 1);
+    const lineText = line.substring(0, column - back);
+    const lineEnd = line.substring(column + front);
+
+    if (cursor.column < back || cursor.column > line.length - front) {
+      if (back) {
+        if (cursor.line > 0) {
+          const lineText = lines[cursor.line - 1];
+          const lineEnd = line;
+  
+          const newLine = lineText + lineEnd;
+          lines.splice(cursor.line - 1, 2, newLine);
+  
+          cursor.line--;
+          cursor.column = lineText.length;
+          affected.map(v => {
+            if (v.line === cursor.line) v.column += lineText.length;
+            v.line -= 1;
+          });
+        }
+      }
+      if (front) {
+        if (cursor.line < lines.length - 1) {
+          const lineText = line;
+          const lineEnd = lines[cursor.line + 1];
+  
+          const newLine = lineText + lineEnd;
+          lines.splice(cursor.line, 2, newLine);
+
+          cursor.column = lineText.length;
+          affected.map(v => {
+            if (v.line === cursor.line + 1) v.column += lineText.length;
+            v.line -= 1;
+          });
+        }
       }
     } else {
-      const lineText = line.substring(0, column - 1);
-      const lineEnd = line.substring(column);
-
       const newLine = lineText + lineEnd;
       lines.splice(cursor.line, 1, newLine);
 
-      cursor.column--;
+      cursor.column -= back;
       affected.map(v => v.column += v.line === cursor.line ? -1 : 0);
     }
   }
@@ -181,7 +206,10 @@ function addTextCursor(code: string, key: string, cursor: Cursor, affected: Curs
       cursor.column += text.length;
     }
 
-    affected.map(v => v.column += v.line === cursor.line ? text.length : 0);
+    affected.map(v => {
+      if (text === '\n') return v.line++;
+      v.column += v.line === cursor.line ? text.length : 0
+    });
   }
   
   return lines.join('\n');

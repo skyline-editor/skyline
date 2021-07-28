@@ -151,7 +151,8 @@ const keywords = [
   'as',
   'export',
   'type',
-  'interface'
+  'interface',
+  'new'
 ];
 const brackets = [
   '{',
