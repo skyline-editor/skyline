@@ -384,8 +384,11 @@ export function tokenize(code: string) {
 
     new_tokens.push(token);
   }
-  console.timeEnd('2_tokenize');
 
+  if (env.string) new_tokens.push(STRING(code.slice(env.string.pos), env.string.pos));
+  if (env.comment) new_tokens.push(COMMENT(code.substr(env.comment.pos), env.comment.pos));
+
+  console.timeEnd('2_tokenize');
   return new_tokens;
 }
 
