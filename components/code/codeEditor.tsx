@@ -275,8 +275,71 @@ export const CodeEditor = ({
       if (state.cursors.length < 1) return;
 
       if (e.key === 'Escape' || e.key === 'Esc') setCursors(state.cursors.slice(0, 1));
-
       if (e.key === 'Tab') e.preventDefault();
+      if (e.key == 'l' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        return;
+      }
+
+      if (!e.ctrlKey && e.altKey && !e.metaKey && e.shiftKey) {
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+
+          let cursors = state.cursors;
+          cursors = cursors.sort((a, b) => {
+            if (a.line < b.line) return -1;
+            if (a.line > b.line) return 1;
+            if (a.column < b.column) return -1;
+            if (a.column > b.column) return 1;
+            return 0;
+          });
+
+          const lines = state.code.split('\n');
+
+          for (let i = 0; i < state.cursors.length; i++) {
+            const cursor = cursors[i];
+            const affected = cursors.slice(i + 1);
+
+            const line = lines[cursor.line];
+            lines.splice(cursor.line, 0, line);
+
+            cursor.line++;
+            affected.map(v => v.line++);
+          }
+          
+          setCode(lines.join('\n'));
+          setCursors(cursors.slice());
+          return;
+        }
+        if (e.key === 'ArrowUp') {
+          e.preventDefault();
+
+          let cursors = state.cursors;
+          cursors = cursors.sort((a, b) => {
+            if (a.line < b.line) return -1;
+            if (a.line > b.line) return 1;
+            if (a.column < b.column) return -1;
+            if (a.column > b.column) return 1;
+            return 0;
+          });
+
+          const lines = state.code.split('\n');
+
+          for (let i = 0; i < state.cursors.length; i++) {
+            const cursor = cursors[i];
+            const affected = cursors.slice(i + 1);
+
+            const line = lines[cursor.line];
+            lines.splice(cursor.line, 0, line);
+
+            affected.map(v => v.line += (v.line == cursor.line) ? 0 : 1);
+          }
+          
+          setCode(lines.join('\n'));
+          setCursors(cursors.slice());
+          return;
+        }
+      }
 
       if (e.ctrlKey && e.altKey && !e.metaKey && !e.shiftKey) {
         if (e.key === 'ArrowDown') {
@@ -374,7 +437,7 @@ export const CodeEditor = ({
         });
 
         let new_cursors = cursors.slice();
-        if (e.ctrlKey) {
+        if (e.altKey) {
           new_cursors.push(cursor);
         } else {
           new_cursors = [cursor];
