@@ -1,5 +1,7 @@
 import { Cursor, validateCursor, validateCursorSome } from "./cursor";
 
+// to see if the next char is an bracket
+
 let extra = '';
 const tab_size = 2;
 
@@ -24,7 +26,7 @@ function addTextCursor(code: string, key: string, cursor: Cursor, affected: Curs
   const lines = code.split('\n');
   const line = lines[cursor.line];
   const column = cursor.column;
-
+  // i need to do if mode === tab {
   if (mode === 'delete') {
     const direction = args[0] as number;
 
@@ -74,10 +76,44 @@ function addTextCursor(code: string, key: string, cursor: Cursor, affected: Curs
       affected.map(v => v.column += v.line === cursor.line ? -1 : 0);
     }
   }
+
   if (mode === 'insert') {
     const text = args[0] as string;
     extra = '';
+        
+    if (key === 'Tab') {
+      const skip = [
+        '(',
+        ')',
+        '{',
+        '}',
+        '[',
+        ']',
+        '\'',
+        '"'
+      ];
+      
+      const nextChar = line[cursor.column];
+      if (nextChar && skip.includes(nextChar)) {
+        cursor.column += 1;
+        return lines.join('\n');
+      }
+    }
+    
+    if (key === ' ') {
+      const nextChar = line[cursor.column];
+      const prevChar = line[cursor.column - 1];
+      const t = prevChar + nextChar;
+      const spacing = [
+        '{}',
+        '[]',
+        '()',
+      ];
+      
+      if (nextChar && prevChar && spacing.includes(t)) extra = ' ';
+    }  
 
+    
     if (text === '(') extra = ')';
     if (text === '{') extra = '}';
     if (text === '[') extra = ']';
@@ -107,6 +143,7 @@ function addTextCursor(code: string, key: string, cursor: Cursor, affected: Curs
   
   return lines.join('\n');
 }
+
 export function addText(code: string, key: string, cursors: Cursor[]) : { code: string, cursors: Cursor[] } {
   if (key === extra) {
     extra = '';

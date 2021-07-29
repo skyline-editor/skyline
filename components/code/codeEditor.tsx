@@ -70,12 +70,10 @@ export const CodeEditor = ({
         return;
       }
 
-      if (!e.ctrlKey && !e.altKey) {
-        const { code, cursors } = addText(state.code, e.key, state.cursors);
+      const { code, cursors } = addText(state.code, e.key, state.cursors);
       
-        setCursors(cursors);
-        setCode(code);
-      }
+      setCursors(cursors);
+      setCode(code);
     });
   }, []);
   
@@ -85,6 +83,8 @@ export const CodeEditor = ({
       onMouseDown={e => {
         e.preventDefault();
         
+        const lines = code.split('\n');
+
         const editor = e.currentTarget.closest('.' + styles.codeEditor);
         const x = e.clientX - editor.getBoundingClientRect().left;
         const y = e.clientY - editor.getBoundingClientRect().top;
@@ -93,6 +93,19 @@ export const CodeEditor = ({
           line: Math.floor(y / Char.height),
           column: Math.floor(x / Char.width),
         });
+        
+        if (cursor.line < 0) {
+          cursor.line = 0;
+          cursor.column = 0;
+        }
+
+        if (cursor.line >= lines.length) {
+          cursor.line = lines.length;
+          cursor.column = lines[cursor.line].length;
+        }
+
+        if (cursor.column < 0) cursor.column = 0;
+        if (cursor.column > lines[cursor.line].length) cursor.column = lines[cursor.line].length;
 
         let new_cursors = cursors.slice();
         if (e.altKey) {
@@ -121,9 +134,8 @@ export const CodeEditor = ({
 let list_id = 0;
 const Code: React.FC<{ code: string }> = ({ code }) => {
   const [tokenizedCode, setTokenizedCode] = useState<React.ReactFragment>(null);
-  
   useEffect(() => {
-    setTokenizedCode(highlight(code).map(v => (<div className={styles.line} key={list_id++}>{v}</div>)));
+    setTokenizedCode(highlight(code, 'typescript').map(v => (<div className={styles.line} key={list_id++}>{v}</div>)));
   }, [code]);
 
   return (
@@ -194,8 +206,8 @@ keyboardShortcuts.push({
 });
 
 keyboardShortcuts.push({
-  name: 'Escape',
-  description: 'Clear all cursors except the first one',
+  name: 'Select Line',
+  description: 'Selects entire line',
 
   key: 'l',
   ctrl: true,
