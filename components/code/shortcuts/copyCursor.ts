@@ -44,10 +44,7 @@ shortcuts.push({
     }, new_cursors[0])
     
     if (last_cursor.line >= code.split('\n').length - 1) return;
-    new_cursors.push({
-      line: last_cursor.line + 1,
-      column: last_cursor.column,
-    });
+    new_cursors.push(new Cursor(last_cursor.line + 1, last_cursor.column));
 
     return {
       code,
