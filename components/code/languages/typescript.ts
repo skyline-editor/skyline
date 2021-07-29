@@ -210,7 +210,7 @@ export default function tokenize(code: string, tokens: string[]) {
       }
       
       new_tokens.push(...between);
-      if (!/\W/g.test(tokens[i + 1])) {
+      if (tokens[i + 1] && !/\W/g.test(tokens[i + 1])) {
         new_tokens.push(tokens[i + 1]);
         pos += tokens[i].length;
         i++;
