@@ -20,7 +20,7 @@ export const Char = {
   height: 20,
 };
 
-const state = { cursors: [], code: '' };
+const state = { cursors: [], code: '', selections: [] };
 
 export interface KeyboardShortcut {
   key?: string;
@@ -45,6 +45,7 @@ export const CodeEditor = ({
 
 
   state.cursors = cursors;
+  state.selections = selections;
   state.code = code;
 
   useEffect(() => {
@@ -71,6 +72,7 @@ export const CodeEditor = ({
         const { code, cursors } = result;
         setCode(code);
         setCursors(cursors);
+        setSelections(state.selections.slice());
         return;
       }
 
@@ -78,6 +80,7 @@ export const CodeEditor = ({
       
       setCode(code);
       setCursors(cursors);
+      setSelections(state.selections.slice());
     });
   }, []);
   
@@ -191,8 +194,10 @@ export const CodeEditor = ({
         console.log(selection.getText(code));
 
         cursors.splice(cursors.length - 1, 1, cursor);
+
+        const same = cursor.line === lastCursor.line && cursor.column === lastCursor.column;
         setCursors(cursors.slice());
-        setSelections([selection]);
+        setSelections(same ? [] : [selection]);
         setActiveSelection(null);
       }}
     >
