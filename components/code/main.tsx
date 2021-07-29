@@ -7,7 +7,7 @@ export default function Main() {
   const [loaded, setLoaded] = React.useState(false);
 
   useEffect(() => {
-    fetch("/test.txt").then(r => r.text()).then(v => {
+    fetch("/small_sample.txt").then(r => r.text()).then(v => {
       setDefaultCode(v.split('\r').join(''));
       setLoaded(true);
     });

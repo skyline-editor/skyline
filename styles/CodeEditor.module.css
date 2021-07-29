@@ -1,6 +1,9 @@
+@value background-color: #1c1e26;
+@value selection-color: rgb(60, 100, 135);
+
 .codeEditor {
   position: relative;
-  background-color: #1c1e26;
+  background-color: background-color;
 
   width: 100%;
   height: 100%;
@@ -13,6 +16,7 @@
 }
 
 .line {
+  position: relative;
   font-family: 'Consolas Ligaturized';
   font-size: 20px;
   height: 20px;
@@ -22,6 +26,8 @@
   margin: 0;
   white-space: pre;
   vertical-align: middle;
+  z-index: 1;
+  line-height: 20px;
 }
 
 .cursor {
@@ -48,4 +54,22 @@
   50% {
     opacity: 0;
   }
+}
+
+.selection {
+  position: absolute;
+}
+.selection_line {
+  position: absolute;
+  background-color: selection-color;
+  border-radius: 4px;
+}
+.selection_block {
+  position: absolute;
+  background-color: selection-color;
+}
+.selection_rounded {
+  position: absolute;
+  background-color: background-color;
+  border-radius: 4px;
 }

@@ -1,31 +1,94 @@
-export interface Cursor {
+export class Cursor {
   line: number;
   column: number;
-}
+  selection?: Selection;
 
-export function validateCursorSome(code: string, cursor: Cursor, change: { line?: boolean, column?: boolean}) : Cursor {
-  const validated = validateCursor(code, cursor);
+  constructor(line: number, column: number) {
+    this.line = line ?? 0;
+    this.column = column ?? 0;
+  }
 
-  cursor.line = change.line ? validated.line : cursor.line;
-  cursor.column = change.column ? validated.column : cursor.column;
+  clone(): Cursor {
+    return new Cursor(this.line, this.column);
+  }
 
-  return cursor;
-}
+  validate(code: string, clone?: boolean, change?: { line?: boolean, column?: boolean}): Cursor {
+    const lines = code.split('\n');
 
-export function validateCursor(code: string, cursor: Cursor) : Cursor {
-  const lines = code.split('\n');
+    clone = clone ?? true;
+    change = change ?? {
+      line: true,
+      column: true
+    };
 
-  let line = cursor.line;
-  let column = cursor.column;
+    let line = this.line;
+    let column = this.column;
 
-  if (line < 0) line = 0;
-  if (line >= lines.length) line = lines.length - 1;
+    if (change.line) {
+      if (line < 0) line = 0;
+      if (line >= lines.length) line = lines.length - 1;
+    }
+    
+    if (change.column) {
+      if (column < 0) column = 0;
+      if (column > lines[line].length) column = lines[line].length;
+    }
+
+    if (clone) {
+      return new Cursor(line, column);
+    } else {
+      this.line = line;
+      this.column = column;
+      return this;
+    }
+  }
+
+  // intended to be used in array.sort()
+  compare(other: Cursor): number {
+    return Cursor.compare(this, other);
+  }
+
+  static compare(a: Cursor, b: Cursor): number {
+    if (a.line < b.line) return -1;
+    if (a.line > b.line) return 1;
+    if (a.column < b.column) return -1;
+    if (a.column > b.column) return 1;
+    return 0;
+  }
+
+  move(code: string, change: { line?: number, column?: number }, clone?: boolean): Cursor {
+    clone = clone ?? true;
+    if (clone) return this.clone().move(code, change, false);
+
+    const lines = code.split('\n');
+    this.validate(code, false);
+    this.line += change.line ?? 0;
+    this.column += change.column ?? 0;
   
-  if (column < 0) column = 0;
-  if (column > lines[line].length) column = lines[line].length;
+    if (this.line < 0) this.line = 0;
+    if (this.line >= lines.length) this.line = lines.length - 1;
 
-  return {
-    line,
-    column,
-  };
+    if (this.column < 0) {
+      this.line--;
+
+      if (this.line < 0) {
+        this.line = 0;
+        this.column = 0;
+      } else {
+        this.column = lines[this.line].length;
+      }
+    }
+    if (this.column > lines[this.line].length) {
+      this.line++;
+
+      if (this.line >= lines.length) {
+        this.line = lines.length - 1;
+        this.column = lines[this.line].length;
+      } else {
+        this.column = 0;
+      }
+    }
+
+    return this;
+  }
 }

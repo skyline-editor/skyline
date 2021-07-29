@@ -1,4 +1,4 @@
-import { Cursor, validateCursor, validateCursorSome } from "./cursor";
+import { Cursor } from "./cursor";
 
 // to see if the next char is an bracket
 
@@ -21,12 +21,11 @@ function addTextCursor(code: string, key: string, cursor: Cursor, affected: Curs
   let [mode, ...args] = ['insert', key] as write_mode;
   if (key in write_modes) [mode, ...args] = write_modes[key];
 
-  cursor = validateCursorSome(code, cursor, { column: true });
+  cursor = cursor.validate(code, false, { column: true });
 
   const lines = code.split('\n');
   const line = lines[cursor.line];
   const column = cursor.column;
-  // i need to do if mode === tab {
   if (mode === 'delete') {
     const direction = args[0] as number;
 
@@ -171,9 +170,9 @@ export function addText(code: string, key: string, cursors: Cursor[]) : { code: 
   }
 
   cursors = cursors.filter((cursor, i) => {
-    cursor = validateCursor(code, cursor);
+    cursor = cursor.validate(code);
     return !cursors.find((v, j) => {
-      v = validateCursor(code, v);
+      v = v.validate(code);
       if (i >= j) return false;
       return v.line === cursor.line && v.column === cursor.column
     });
