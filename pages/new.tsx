@@ -1,7 +1,8 @@
-import CodeEditor from '../components/code/main';
+import FileSystem from '../functions/FileSystem'
+import CodeEditor from '../components/code/main'
 
 export default function New() {
-  return (
-    <CodeEditor />
-  )
+  let fs = new FileSystem()
+  fs.listFiles('Desktop')
+  return <CodeEditor />
 }

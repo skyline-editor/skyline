@@ -5,11 +5,17 @@
   },
   "build": {
     "distDir": "dist",
-    "devPath": "http://localhost:3000",
+    "devPath": "http://localhost:3000/new",
     "beforeDevCommand": "",
     "beforeBuildCommand": ""
   },
+
   "tauri": {
+    "allowlist": {
+      "fs": {
+        "readDir": true
+      }
+    },
     "bundle": {
       "active": true,
       "targets": "all",
@@ -47,9 +53,6 @@
     },
     "updater": {
       "active": false
-    },
-    "allowlist": {
-      "all": true
     },
     "windows": [
       {
