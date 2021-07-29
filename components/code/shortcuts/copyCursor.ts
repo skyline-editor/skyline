@@ -1,4 +1,5 @@
 import { KeyboardShortcut } from "../codeEditor";
+import { Cursor } from "../util/cursor";
 const shortcuts: KeyboardShortcut[] = [];
 
 shortcuts.push({
@@ -18,10 +19,7 @@ shortcuts.push({
     }, new_cursors[0])
 
     if (first_cursor.line < 1) return;
-    new_cursors.push({
-      line: first_cursor.line - 1,
-      column: first_cursor.column,
-    });
+    new_cursors.push(new Cursor(first_cursor.line - 1, first_cursor.column));
 
     return {
       code,
