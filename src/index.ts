@@ -207,8 +207,12 @@ export class Editor {
           break
         }
         case 'ArrowDown': {
-          // can't go down
-          if (position.line === this.lines.length - 1) return
+          if (position.line === this.lines.length - 1) {
+            // can't go down
+            if (position.column === this.currentLine.length) return
+            position.column = this.currentLine.length
+            break
+          }
           position.line++
           position.column = Math.min(this.currentLine.length, position.column)
           break
@@ -286,6 +290,8 @@ export class Editor {
   }
 
   draw(ctx: CanvasRenderingContext2D) {
+    console.log('draw')
+
     const {
       canvas,
       config: { fontSize, fontFamily, lineHeight },
