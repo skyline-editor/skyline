@@ -212,7 +212,11 @@ let list_id = 0;
 const Code: React.FC<{ code: string }> = ({ code }) => {
   const [tokenizedCode, setTokenizedCode] = useState<React.ReactFragment>(null);
   useEffect(() => {
-    setTokenizedCode(highlight(code, 'typescript').map(v => (<div className={styles.line} key={list_id++}>{v}</div>)));
+    setTokenizedCode(highlight(code, 'typescript').map(v => (<div className={styles.line} key={list_id++}>{v.map(v => {
+      return (
+        <span style={{ color: v.color }}>{v.text}</span>
+      );
+    })}</div>)));
   }, [code]);
 
   return (

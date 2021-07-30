@@ -22,7 +22,13 @@ const colors = {
   variable: '#83ADFF',
   propery: '#83ADFF',
   comment: '#46667E',
+  normal: '#f8f8f2'
 };
+
+interface ColoredText {
+  text: string;
+  color: string;
+}
 
 let list_id = 0;
 
@@ -33,47 +39,37 @@ export function highlight(code: string, language: string) {
 }
 
 function getElemsFromTokens(tokens: Token[]) {
-  const elems = [];
+  const elems: ColoredText[] = [];
   for (const token of tokens) {
-    if (typeof token === 'string') {
-      elems.push(token);
-      continue;
-    }
-    if (token.type in colors && typeof token.value === 'string') {
-      const lines = token.value.split('\n');
-      const result = [];
+    if (typeof token === 'string' || typeof token.value === 'string') {
+      const value = typeof token === 'string' ? token : token.value as string;
+
+      const lines = value.split('\n');
       for (let i = 0; i < lines.length; i++) {
-        if (i > 0) result.push('\n');
-        if (token.type == 'comment') {
-          result.push(<span style={{ color: colors[token.type], fontStyle: 'italic' }} key={list_id++} >{lines[i]}</span>);
-          continue;
-        }
-        result.push(<span style={{ color: colors[token.type] }} key={list_id++} >{lines[i]}</span>);
+        if (i > 0) elems.push(null);
+        elems.push({
+          text: lines[i],
+          color: typeof token === 'string' ? colors.normal : colors[token.type] ?? colors.normal
+        });
       }
-      
-      elems.push(...result);
       continue;
     }
 
     if (typeof token.value !== 'string') {
-      const code = getElemsFromTokens(token.value);
-      if (token.type === 'parentheses') elems.push(...code);
-      if (token.type === 'brackets') elems.push(...code);
-      if (token.type === 'braces') elems.push(...code);
+      elems.push(...getElemsFromTokens(token.value));
       continue;
     }
-    elems.push(token.value);
   }
   return elems;
 }
 export function codeFromTokens(tokens: Token[]) {
   const elems = getElemsFromTokens(tokens);
-  if (elems[elems.length - 1] !== '\n') elems.push('\n');
+  if (elems[elems.length - 1]) elems.push(null);
 
-  const lines = [];
-  let line = [];
+  const lines: ColoredText[][] = [];
+  let line: ColoredText[] = [];
   for (let i = 0; i < elems.length; i++) {
-    if (elems[i] === '\n') {
+    if (!elems[i]) {
       lines.push(line);
       line = [];
       continue;
