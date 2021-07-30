@@ -31,7 +31,6 @@ function controlBackspace(editor: Editor) {
 
   editor.currentLine = currentLine.slice(0, i) + currentLine.slice(column)
   position.column = i
-  console.log(i)
 
   return true
 }
