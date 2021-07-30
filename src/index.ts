@@ -208,10 +208,15 @@ export class Editor {
           break
         }
         case 'ArrowDown': {
-          if (position.line === this.lines.length - 1) {
+          const { lines, currentLine } = this
+          if (e.altKey && e.shiftKey) {
+            lines.splice(position.line + 1, 0, currentLine)
+          }
+
+          if (position.line === lines.length - 1) {
             // can't go down
-            if (position.column === this.currentLine.length) return
-            position.column = this.currentLine.length
+            if (position.column === currentLine.length) return
+            position.column = currentLine.length
             break
           }
           position.line++
