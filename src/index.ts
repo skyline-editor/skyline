@@ -301,20 +301,29 @@ export class Editor {
       ctx,
     })
 
-    let lineNumberOffset!: number
+    const xOffset = 2
+    this.setFont(fontFamily, fontSize - xOffset)
+    const lineNumberOffset = ctx.measureText('8888').width
 
+    const getY = (i: number) => i * fontSize * lineHeight + Y_OFFSET
+
+    ctx.fillStyle = '#aaa'
     for (let i = 0; i < lines.length; i++) {
       // offset for line number font size
-      const offset = 2
-      this.setFont(fontFamily, fontSize - offset)
-      lineNumberOffset ??= ctx.measureText('8888').width
-      const y = i * fontSize * lineHeight + Y_OFFSET
-      ctx.fillStyle = i === this.position.line ? '#eee' : '#aaa'
-      ctx.fillText((i + 1).toString(), 0, y + offset)
+      switch (i) {
+        case this.position.line + 1:
+          ctx.fillStyle = '#aaa'
+          break
+        case this.position.line:
+          ctx.fillStyle = '#eee'
+      }
+      ctx.fillText((i + 1).toString(), 0, getY(i) + xOffset)
+    }
 
-      this.setFont(fontFamily, fontSize)
-      ctx.fillStyle = 'white'
-      ctx.fillText(lines[i], lineNumberOffset, y)
+    this.setFont(fontFamily, fontSize)
+    ctx.fillStyle = 'white'
+    for (let i = 0; i < lines.length; i++) {
+      ctx.fillText(lines[i], lineNumberOffset, getY(i))
     }
 
     // TODO(sno2): make this dynamic for sans-serif fonts
