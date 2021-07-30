@@ -49,6 +49,10 @@ export class Editor {
     this.lines.splice(index, 1)
   }
 
+  get fullText(): string {
+    return this.lines.join('\n')
+  }
+
   get currentLine() {
     return this.lines[this.position.line]
   }
@@ -89,7 +93,16 @@ export class Editor {
     ctx.textAlign = 'left'
     ctx.textBaseline = 'top'
 
+    canvas.addEventListener('mousedown', (e) => {
+      const { offsetX: x, offsetY: y } = e
+
+      if (y < this.lines.length * this.config.lineHeight) {
+        console.log('in y!')
+      }
+    })
+
     // TODO(sno2): figure out why it won't let us use `canvas.addEventListener`
+    // with `keydown`
 
     window.addEventListener('keydown', (e) => {
       // NOTE: remember to use `return` if a redraw is not required (i.e. doing
@@ -267,11 +280,19 @@ export class Editor {
       ctx,
     })
 
-    ctx.fillStyle = 'white'
-    this.setFont(fontFamily, fontSize)
+    const lineNumberOffset = 35
 
     for (let i = 0; i < lines.length; i++) {
-      ctx.fillText(lines[i], 0, i * fontSize * lineHeight + Y_OFFSET)
+      // offset for line number font size
+      const offset = 2
+      this.setFont(fontFamily, fontSize - offset)
+      const y = i * fontSize * lineHeight + Y_OFFSET
+      ctx.fillStyle = '#aaa'
+      ctx.fillText((i + 1).toString(), 0, y + offset)
+
+      this.setFont(fontFamily, fontSize)
+      ctx.fillStyle = 'white'
+      ctx.fillText(lines[i], lineNumberOffset, y)
     }
 
     // TODO(sno2): make this dynamic for sans-serif fonts
@@ -280,7 +301,7 @@ export class Editor {
     this.rect({
       width: 2,
       height: fontSize + 3,
-      x: textSizing.width * this.position.column + 1,
+      x: textSizing.width * this.position.column + 1 + lineNumberOffset,
       y: fontSize * lineHeight * this.position.line + Y_OFFSET - 3,
       fill: 'yellow',
       ctx,
