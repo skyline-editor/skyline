@@ -302,8 +302,6 @@ export class Editor {
   }
 
   draw(ctx: CanvasRenderingContext2D) {
-    console.log('draw')
-
     const {
       canvas,
       config: { fontSize, fontFamily, lineHeight },
