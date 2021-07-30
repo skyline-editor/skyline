@@ -69,8 +69,9 @@ export class Editor {
 
   mount(el: HTMLCanvasElement) {
     this.canvas = el
-    el.width = window.innerWidth
-    el.height = window.innerHeight
+    const rect = el.getBoundingClientRect()
+    el.width = rect.width
+    el.height = rect.height
   }
 
   rect(init: RectInit) {
