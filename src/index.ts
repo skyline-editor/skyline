@@ -197,6 +197,12 @@ export class Editor {
           break
         }
         case 'ArrowUp': {
+          if (e.altKey && e.shiftKey) {
+            const { lines, currentLine } = this
+            lines.splice(position.line, 0, currentLine)
+            break
+          }
+
           // can't go up
           if (position.line === 0) {
             position.column = 0
