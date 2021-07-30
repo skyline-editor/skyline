@@ -17,10 +17,15 @@ export class Editor {
   config: EditorConfig
 
   constructor(config?: Partial<EditorConfig>) {
-    this.config = {
-      ...getDefaultConfig(),
+    const defaultConfig = getDefaultConfig()
+    const newConfig = {
+      ...defaultConfig,
       ...config,
     }
+    if (config.includeDefaultShortcuts === true) {
+      newConfig.shortcuts.push(...defaultConfig.shortcuts)
+    }
+    this.config = newConfig
   }
 
   deleteLine(index: number) {
@@ -66,18 +71,26 @@ export class Editor {
   }
 
   /**
-   * @returns a boolean indictating whether a redraw is required
+   * This emulates a built-in key being pressed.
+   * @param code the key code
+   * @param serialized the value appended to the text (i.e. regular
+   * letter/number) when the `code` is not recognized
+   * @param preventDefault the function for preventing the default action
+   * @returns whether a redraw is required
+   *
+   * ## Notes
+   *
+   * - Make sure you pass in `preventDefault` if you are trying to emulate a
+   *   TAB keypress.
    */
-  handleKeypress(
-    e: Pick<
-      KeyboardEvent,
-      'key' | 'code' | 'altKey' | 'shiftKey' | 'ctrlKey' | 'preventDefault'
-    >
-  ): boolean {
-    // NOTE: remember to use `return` if a redraw is not required (i.e. doing
-    // backspace when you are at the start of the file)
+  emulateBuiltinKey(
+    code: string,
+    serialized?: string,
+    preventDefault?: () => void
+  ) {
     const { position } = this
-    switch (e.code) {
+
+    switch (code) {
       case 'Backspace': {
         const { column, line } = position
 
@@ -90,34 +103,6 @@ export class Editor {
             currentLine,
             config: { tabSize },
           } = this
-          if (e.ctrlKey) {
-            const alpha = 'abcdefghijklmnopqrstuvwxyz'
-            const alikeChars = [
-              ' ',
-              ')(*&^%$#@!~`{}|:"<>?[]\\;\',./_-+=',
-              `${alpha}${alpha.toUpperCase()}0123456789`,
-            ]
-            let i = column - 1
-            let group!: string
-            while (i > 0) {
-              const ch = currentLine[i]
-              if (group === undefined) {
-                group = alikeChars.find((val) => val.includes(ch))
-              } else {
-                if (!group.includes(ch)) {
-                  i++
-                  break
-                }
-              }
-
-              i--
-            }
-
-            this.currentLine =
-              currentLine.slice(0, i) + currentLine.slice(column)
-            position.column = i
-            break
-          }
 
           // removes "tabs"
           if (
@@ -169,12 +154,6 @@ export class Editor {
         break
       }
       case 'ArrowUp': {
-        if (e.altKey && e.shiftKey) {
-          const { lines, currentLine } = this
-          lines.splice(position.line, 0, currentLine)
-          break
-        }
-
         // can't go up
         if (position.line === 0) {
           position.column = 0
@@ -187,10 +166,6 @@ export class Editor {
       }
       case 'ArrowDown': {
         const { lines, currentLine } = this
-        if (e.altKey && e.shiftKey) {
-          lines.splice(position.line + 1, 0, currentLine)
-        }
-
         if (position.line === lines.length - 1) {
           // can't go down
           if (position.column === currentLine.length) return false
@@ -231,7 +206,12 @@ export class Editor {
         break
       }
       case 'Tab': {
-        e.preventDefault()
+        if (preventDefault === undefined) {
+          console.error(
+            "Tried to emulate built-in keypress without 'preventDefault' passed in."
+          )
+        }
+        preventDefault?.()
 
         const {
           position: { column },
@@ -257,16 +237,62 @@ export class Editor {
       case 'ShiftRight':
         break
       default: {
-        if (e.key.length > 1) {
-          console.warn(`Unhandled key: ${e.key}`)
+        if (serialized.length > 1) {
+          console.warn(`Unhandled key: ${serialized}`)
           break
         }
         const lineText = this.currentLine
-        this.currentLine = insertStrAtIndex(lineText, position.column, e.key)
+        this.currentLine = insertStrAtIndex(
+          lineText,
+          position.column,
+          serialized
+        )
         this.position.column++
       }
     }
     return true
+  }
+
+  /**
+   * @returns a boolean indictating whether a redraw is required
+   */
+  handleKeypress(
+    e: Pick<
+      KeyboardEvent,
+      'key' | 'code' | 'altKey' | 'shiftKey' | 'ctrlKey' | 'preventDefault'
+    >
+  ): boolean {
+    // NOTE: remember to use `return` if a redraw is not required (i.e. doing
+    // backspace when you are at the start of the file)
+    const {
+      config: { shortcuts },
+    } = this
+
+    let shortcutRedraw = false
+    let usedShortcut = false
+    for (let i = 0; i < shortcuts.length; i++) {
+      const shortcut = shortcuts[i]
+      if (
+        e.key === shortcut.key &&
+        (shortcut.alt === undefined ? true : e.altKey === shortcut.alt) &&
+        (shortcut.ctrl === undefined ? true : e.ctrlKey === shortcut.ctrl) &&
+        (shortcut.shift === undefined ? true : e.shiftKey === shortcut.shift)
+      ) {
+        usedShortcut ||= true
+        try {
+          const needRedraw = shortcuts[i].impl(this)
+          shortcutRedraw ||= needRedraw
+        } catch (err) {
+          console.error(`Shortcut failed: ${shortcut.name}\n${err}`)
+          shortcutRedraw ||= true
+        }
+      }
+    }
+
+    if (usedShortcut) {
+      return shortcutRedraw
+    }
+    return this.emulateBuiltinKey(e.code, e.key, () => e.preventDefault())
   }
 
   setup() {

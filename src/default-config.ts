@@ -1,4 +1,7 @@
 import type { EditorConfig } from './types'
+import { copyCursorUpShortcut } from './shortcuts/copy-cursor-up'
+import { copyCursorDownShortcut } from './shortcuts/copy-cursor-down'
+import { controlBackspaceShortcut } from './shortcuts/control-backspace'
 
 export const getDefaultConfig = (): EditorConfig => ({
   fontFamily: 'consolas',
@@ -7,4 +10,10 @@ export const getDefaultConfig = (): EditorConfig => ({
   cursorType: 'slim',
   tabSize: 2,
   softWrap: false,
+  includeDefaultShortcuts: true,
+  shortcuts: [
+    copyCursorUpShortcut(),
+    copyCursorDownShortcut(),
+    controlBackspaceShortcut(),
+  ],
 })
