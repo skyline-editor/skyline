@@ -3,7 +3,7 @@ import { Cursor } from "../util/cursor";
 const shortcuts: KeyboardShortcut[] = [];
 
 function moveCursors(code: string, cursors: Cursor[], change: Cursor) : Cursor[] {
-  cursors = cursors.map(cursor => cursor.move(code, change));
+  cursors = cursors.map(cursor => cursor.move(code, change, false));
   cursors = cursors.filter((cursor, i) => {
     cursor = cursor.validate(code);
     return !cursors.find((v, j) => {

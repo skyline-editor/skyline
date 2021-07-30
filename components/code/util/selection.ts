@@ -7,6 +7,9 @@ export class Selection {
   constructor(start: Cursor, end?: Cursor) {
     this.start = end ? start : start.clone();
     this.end = end ?? start;
+
+    this.start.selection = this;
+    this.end.selection = this;
   }
 
   moveStart(code: string, change: { line?: number, column?: number }): Selection {

@@ -1,3 +1,5 @@
+import { Selection } from './selection';
+
 export class Cursor {
   line: number;
   column: number;
@@ -56,39 +58,43 @@ export class Cursor {
     return 0;
   }
 
-  move(code: string, change: { line?: number, column?: number }, clone?: boolean): Cursor {
+  move(code: string, change: { line?: number, column?: number }, clone?: boolean) : Cursor {
     clone = clone ?? true;
     if (clone) return this.clone().move(code, change, false);
 
     const lines = code.split('\n');
-    this.validate(code, false);
-    this.line += change.line ?? 0;
-    this.column += change.column ?? 0;
+    const validated = this.validate(code);
   
-    if (this.line < 0) this.line = 0;
-    if (this.line >= lines.length) this.line = lines.length - 1;
-
-    if (this.column < 0) {
-      this.line--;
-
-      if (this.line < 0) {
-        this.line = 0;
-        this.column = 0;
-      } else {
-        this.column = lines[this.line].length;
+    if (change.line) {
+      this.line = validated.line + change.line;
+      if (this.line < 0) this.line = 0;
+      if (this.line >= lines.length) this.line = lines.length - 1;
+    }
+  
+    if (change.column) {
+      this.column = validated.column + change.column;
+      if (this.column < 0) {
+        this.line--;
+  
+        if (this.line < 0) {
+          this.line = 0;
+          this.column = 0;
+        } else {
+          this.column = lines[this.line].length;
+        }
+      }
+      if (this.column > lines[this.line].length) {
+        this.line++;
+  
+        if (this.line >= lines.length) {
+          this.line = lines.length - 1;
+          this.column = lines[this.line].length;
+        } else {
+          this.column = 0;
+        }
       }
     }
-    if (this.column > lines[this.line].length) {
-      this.line++;
-
-      if (this.line >= lines.length) {
-        this.line = lines.length - 1;
-        this.column = lines[this.line].length;
-      } else {
-        this.column = 0;
-      }
-    }
-
+    
     return this;
   }
 }
