@@ -280,14 +280,15 @@ export class Editor {
       ctx,
     })
 
-    const lineNumberOffset = 35
+    let lineNumberOffset!: number
 
     for (let i = 0; i < lines.length; i++) {
       // offset for line number font size
       const offset = 2
       this.setFont(fontFamily, fontSize - offset)
+      lineNumberOffset ??= ctx.measureText('8888').width
       const y = i * fontSize * lineHeight + Y_OFFSET
-      ctx.fillStyle = '#aaa'
+      ctx.fillStyle = i === this.position.line ? '#eee' : '#aaa'
       ctx.fillText((i + 1).toString(), 0, y + offset)
 
       this.setFont(fontFamily, fontSize)
