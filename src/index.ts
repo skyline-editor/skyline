@@ -95,14 +95,6 @@ export class Editor {
     ctx.textAlign = 'left'
     ctx.textBaseline = 'top'
 
-    canvas.addEventListener('mousedown', (e) => {
-      const { offsetX: x, offsetY: y } = e
-
-      if (y < this.lines.length * this.config.lineHeight) {
-        console.log('in y!')
-      }
-    })
-
     // TODO(sno2): figure out why it won't let us use `canvas.addEventListener`
     // with `keydown`
 
@@ -136,7 +128,6 @@ export class Editor {
                 const ch = currentLine[i]
                 if (group === undefined) {
                   group = alikeChars.find((val) => val.includes(ch))
-                  console.log(ch)
                 } else {
                   if (!group.includes(ch)) {
                     i++
