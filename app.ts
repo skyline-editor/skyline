@@ -2,10 +2,11 @@ import { Editor } from './src/index'
 
 // all of these options and the object are optional - sane defaults are used
 const editor = new Editor({
-  fontSize: 25,
+  fontSize: 22,
   fontFamily: 'consolas',
   cursorType: 'slim',
   tabSize: 2,
+  lineHeight: 1.3,
 })
 
 // this makes it show up in dev tools for customizing on the fly

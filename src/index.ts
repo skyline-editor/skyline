@@ -38,8 +38,8 @@ export class Editor {
   constructor(config?: Partial<EditorConfig>) {
     this.config = {
       fontFamily: 'consolas',
-      fontSize: 25,
-      lineHeight: 1.25,
+      fontSize: 22,
+      lineHeight: 1.3,
       cursorType: 'slim',
       tabSize: 2,
       softWrap: false,
@@ -69,9 +69,9 @@ export class Editor {
 
   mount(el: HTMLCanvasElement) {
     this.canvas = el
-    const rect = el.getBoundingClientRect()
-    el.width = rect.width
-    el.height = rect.height
+    const { width, height } = el.getBoundingClientRect()
+    el.width = width
+    el.height = height
   }
 
   rect(init: RectInit) {
