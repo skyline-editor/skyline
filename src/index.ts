@@ -14,6 +14,7 @@ export interface EditorConfig {
   cursorType: 'slim'
   /** The number of spaces within a "tab". This **must** not be < 2. */
   tabSize: number
+  softWrap: boolean
 }
 
 function insertStrAtIndex(parent: string, index: number, str: string): string {
@@ -41,6 +42,7 @@ export class Editor {
       lineHeight: 1.25,
       cursorType: 'slim',
       tabSize: 2,
+      softWrap: false,
       ...config,
     }
   }
@@ -107,7 +109,6 @@ export class Editor {
     window.addEventListener('keydown', (e) => {
       // NOTE: remember to use `return` if a redraw is not required (i.e. doing
       // backspace when you are at the start of the file)
-
       const { position } = this
       switch (e.code) {
         case 'Backspace': {
@@ -122,6 +123,35 @@ export class Editor {
               currentLine,
               config: { tabSize },
             } = this
+            if (e.ctrlKey) {
+              const alpha = 'abcdefghijklmnopqrstuvwxyz'
+              const alikeChars = [
+                ' ',
+                ')(*&^%$#@!~`{}|:"<>?[]\\;\',./_-+=',
+                `${alpha}${alpha.toUpperCase()}0123456789`,
+              ]
+              let i = column - 1
+              let group!: string
+              while (i > 0) {
+                const ch = currentLine[i]
+                if (group === undefined) {
+                  group = alikeChars.find((val) => val.includes(ch))
+                  console.log(ch)
+                } else {
+                  if (!group.includes(ch)) {
+                    i++
+                    break
+                  }
+                }
+
+                i--
+              }
+
+              this.currentLine =
+                currentLine.slice(0, i) + currentLine.slice(column)
+              position.column = i
+              break
+            }
 
             // removes "tabs"
             if (
