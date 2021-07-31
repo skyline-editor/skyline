@@ -371,7 +371,7 @@ export class Editor {
             return
           }
 
-          ctx.transform(1, 0, 0, 1, 0, e.deltaY > 0 ? -35 : 35)
+          ctx.translate(0, e.deltaY > 0 ? -35 : 35)
 
           window.requestAnimationFrame(() => void this.draw())
         }
