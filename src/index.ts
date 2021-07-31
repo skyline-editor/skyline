@@ -53,11 +53,17 @@ export class Editor {
     return this.lines[line][index]
   }
 
-  mount(el: HTMLCanvasElement) {
-    this.canvas = el
-    const { width, height } = el.getBoundingClientRect()
-    el.width = width
-    el.height = height
+  mount(canvas: HTMLCanvasElement) {
+    this.canvas = canvas
+    const dpr = window.devicePixelRatio ?? 1
+
+    const ctx = canvas.getContext('2d')!
+    this.ctx = ctx
+
+    const { width, height } = canvas.getBoundingClientRect()
+    canvas.width = width * dpr
+    canvas.height = height * dpr
+    this.ctx.scale(dpr, dpr)
   }
 
   rect(init: RectInit) {
@@ -306,9 +312,7 @@ export class Editor {
   }
 
   setup() {
-    const { canvas } = this
-    const ctx = canvas.getContext('2d')!
-    this.ctx = ctx
+    const { canvas, ctx } = this
 
     ctx.textAlign = 'left'
     ctx.textBaseline = 'top'
