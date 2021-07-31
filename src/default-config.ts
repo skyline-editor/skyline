@@ -16,4 +16,5 @@ export const getDefaultConfig = (): EditorConfig => ({
     copyCursorDownShortcut(),
     controlBackspaceShortcut(),
   ],
+  showLineNumbers: true,
 })

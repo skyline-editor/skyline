@@ -320,7 +320,7 @@ export class Editor {
   draw(ctx: CanvasRenderingContext2D) {
     const {
       canvas,
-      config: { fontSize, fontFamily, lineHeight },
+      config: { fontSize, fontFamily, lineHeight, showLineNumbers },
       lines,
     } = this
 
@@ -335,21 +335,23 @@ export class Editor {
 
     const xOffset = 2
     this.setFont(fontFamily, fontSize - xOffset)
-    const lineNumberOffset = ctx.measureText('8888').width
+    const lineNumberOffset = showLineNumbers ? ctx.measureText('8888').width : 0
 
     const getY = (i: number) => i * fontSize * lineHeight + Y_OFFSET
 
-    ctx.fillStyle = '#aaa'
-    for (let i = 0; i < lines.length; i++) {
-      // offset for line number font size
-      switch (i) {
-        case this.position.line + 1:
-          ctx.fillStyle = '#aaa'
-          break
-        case this.position.line:
-          ctx.fillStyle = '#eee'
+    if (showLineNumbers) {
+      ctx.fillStyle = '#aaa'
+      for (let i = 0; i < lines.length; i++) {
+        // offset for line number font size
+        switch (i) {
+          case this.position.line + 1:
+            ctx.fillStyle = '#aaa'
+            break
+          case this.position.line:
+            ctx.fillStyle = '#eee'
+        }
+        ctx.fillText((i + 1).toString(), 0, getY(i) + xOffset)
       }
-      ctx.fillText((i + 1).toString(), 0, getY(i) + xOffset)
     }
 
     this.setFont(fontFamily, fontSize)

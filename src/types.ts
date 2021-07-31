@@ -30,4 +30,5 @@ export interface EditorConfig {
   softWrap: boolean
   includeDefaultShortcuts: boolean
   shortcuts: Shortcut[]
+  showLineNumbers: boolean
 }
