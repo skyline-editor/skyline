@@ -269,6 +269,11 @@ export class Editor {
     return 50
   }
 
+  write(text: string) {
+    const { currentLine, position } = this
+    this.currentLine = insertStrAtIndex(currentLine, position.column, text)
+  }
+
   /**
    * @returns a boolean indictating whether a redraw is required
    */
