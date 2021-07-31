@@ -14,7 +14,12 @@ export class Editor {
   specialKeyState = {
     shift: false,
   }
+  scroll = {
+    x: 0,
+    y: 0,
+  }
   config: EditorConfig
+  ctx!: CanvasRenderingContext2D
 
   constructor(config?: Partial<EditorConfig>) {
     const defaultConfig = getDefaultConfig()
@@ -253,6 +258,11 @@ export class Editor {
     return true
   }
 
+  /** Requires the `ctx` to be set. */
+  get lineNumberOffset() {
+    return 50
+  }
+
   /**
    * @returns a boolean indictating whether a redraw is required
    */
@@ -298,6 +308,7 @@ export class Editor {
   setup() {
     const { canvas } = this
     const ctx = canvas.getContext('2d')!
+    this.ctx = ctx
 
     ctx.textAlign = 'left'
     ctx.textBaseline = 'top'
@@ -310,19 +321,78 @@ export class Editor {
       const shouldRedraw = this.handleKeypress(e)
 
       if (shouldRedraw === true) {
-        window.requestAnimationFrame(() => void this.draw(ctx!))
+        window.requestAnimationFrame(() => void this.draw())
       }
     })
 
-    this.draw(ctx!)
+    canvas.addEventListener(
+      'mousedown',
+      (e) => {
+        const {
+          lines,
+          config: { fontSize, lineHeight },
+          position,
+        } = this
+
+        const lineIdx = Math.floor(
+          (e.offsetY + this.scroll.y * 35) / (fontSize * lineHeight)
+        )
+        position.line = Math.min(lines.length - 1, lineIdx)
+
+        const { currentLine, lineNumberOffset } = this
+        const colIdx = Math.round(
+          (e.offsetX - lineNumberOffset) / this.ctx.measureText('0').width
+        )
+        position.column = Math.max(0, Math.min(colIdx, currentLine.length))
+
+        window.requestAnimationFrame(() => void this.draw())
+      },
+      { passive: true }
+    )
+
+    canvas.addEventListener('contextmenu', (e) => {
+      e.preventDefault()
+    })
+
+    canvas.addEventListener(
+      'wheel',
+      (e) => {
+        const { deltaY } = e
+        const { scroll } = this
+
+        if (deltaY !== 0) {
+          scroll.y += deltaY > 0 ? 1 : -1
+          if (scroll.y < 0) {
+            scroll.y = 0
+            return
+          }
+
+          ctx.transform(1, 0, 0, 1, 0, e.deltaY > 0 ? -35 : 35)
+
+          window.requestAnimationFrame(() => void this.draw())
+        }
+      },
+      { passive: true }
+    )
+
+    this.draw()
   }
 
-  draw(ctx: CanvasRenderingContext2D) {
+  draw() {
     const {
       canvas,
       config: { fontSize, fontFamily, lineHeight, showLineNumbers },
       lines,
+      scroll,
+      ctx,
+      lineNumberOffset,
     } = this
+
+    // this check will probably need to be removed if we add more things that
+    // change the positions of the editor
+    if (scroll.y !== 0) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height * scroll.y)
+    }
 
     this.rect({
       width: canvas.width,
@@ -335,7 +405,6 @@ export class Editor {
 
     const xOffset = 2
     this.setFont(fontFamily, fontSize - xOffset)
-    const lineNumberOffset = showLineNumbers ? ctx.measureText('8888').width : 0
 
     const getY = (i: number) => i * fontSize * lineHeight + Y_OFFSET
 
@@ -350,7 +419,7 @@ export class Editor {
           case this.position.line:
             ctx.fillStyle = '#eee'
         }
-        ctx.fillText((i + 1).toString(), 0, getY(i) + xOffset)
+        ctx.fillText((i + 1).toString(), 0, getY(i) + xOffset, lineNumberOffset)
       }
     }
 
