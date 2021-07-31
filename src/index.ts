@@ -382,20 +382,33 @@ export class Editor {
     this.draw()
   }
 
+  /** Gets the actual pixel offset of the scroll view. */
+  get scrollY() {
+    const { y } = this.scroll
+    return y * 35
+  }
+
   draw() {
     const {
       canvas,
       config: { fontSize, fontFamily, lineHeight, showLineNumbers },
       lines,
-      scroll,
+      scrollY,
       ctx,
       lineNumberOffset,
     } = this
 
+    const scrollSafety = 60
+
     // this check will probably need to be removed if we add more things that
     // change the positions of the editor
-    if (scroll.y !== 0) {
-      ctx.clearRect(0, 0, canvas.width, canvas.height * scroll.y)
+    if (scrollY !== 0) {
+      ctx.clearRect(
+        0,
+        scrollY - scrollSafety,
+        canvas.width,
+        canvas.height + scrollSafety * 2
+      )
     }
 
     this.rect({
@@ -411,10 +424,19 @@ export class Editor {
     this.setFont(fontFamily, fontSize - xOffset)
 
     const getY = (i: number) => i * fontSize * lineHeight + Y_OFFSET
+    // We will still render the lines & line numbers +- 60 pixels in case the
+    // scrolling event takes too long to re-draw the screen.
 
     if (showLineNumbers) {
       ctx.fillStyle = '#aaa'
       for (let i = 0; i < lines.length; i++) {
+        if (
+          getY(i) + scrollSafety < scrollY ||
+          getY(i) - scrollSafety > canvas.height + scrollY
+        ) {
+          continue
+        }
+
         // offset for line number font size
         switch (i) {
           case this.position.line + 1:
@@ -430,6 +452,12 @@ export class Editor {
     this.setFont(fontFamily, fontSize)
     ctx.fillStyle = 'white'
     for (let i = 0; i < lines.length; i++) {
+      if (
+        getY(i) + scrollSafety < scrollY ||
+        getY(i) - scrollSafety > canvas.height + scrollY
+      ) {
+        continue
+      }
       ctx.fillText(lines[i], lineNumberOffset, getY(i))
     }
 
