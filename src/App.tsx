@@ -16,23 +16,8 @@ function App() {
         <Sidebar />
         <div className="code">
           <CodeEditor
-            initialValue={`{
-  "name": "Skyline",
-  "version": "0.0.1",
-  "description": "A simple editor for the web.",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "Skyline",
-  "license": "MIT",
-  "dependencies": {
-    "react": "^15.4.2",
-    "react-dom": "^15.4.2"
-  }
-  "number": 1
-  "boolean": true
-}`}
+            initialValue={`import { greet } from 'hello'`}
+            language="typescript"
           />
         </div>
       </div>

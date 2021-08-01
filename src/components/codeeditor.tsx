@@ -1,9 +1,9 @@
 import React from "react";
 import { useEffect } from "react";
-import { Editor } from "skyline-editor"
+import { Editor } from "../../editor/"
 import WebFont from 'webfontloader';
 
-const CodeEditor: React.FC<{ initialValue: string }> = ({ initialValue }) => {
+const CodeEditor: React.FC<{ initialValue: string, language: string }> = ({ initialValue, language }) => {
   const [editor, setEditor] = React.useState<Editor>(null);
   const canvas = React.useRef(null);
 
@@ -15,7 +15,7 @@ const CodeEditor: React.FC<{ initialValue: string }> = ({ initialValue }) => {
       }
     });
 
-    const editor = new Editor(initialValue);
+    const editor = new Editor(initialValue, language);
     setEditor(editor);
   }, []);
 
