@@ -1,0 +1,10 @@
+.navbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  background-color: #2d3041;
+  top: 0;
+  height: 5%;
+  width: 100%;
+}

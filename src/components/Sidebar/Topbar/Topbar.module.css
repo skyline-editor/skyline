@@ -1,0 +1,9 @@
+.topbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #2d3041;
+  height: 5%;
+  width: 100%;
+  gap: 1.6rem;
+}
