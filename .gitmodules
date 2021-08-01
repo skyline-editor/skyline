@@ -1,0 +1,3 @@
+[submodule "editor"]
+	path = editor
+	url = https://github.com/skyline-editor/editor
