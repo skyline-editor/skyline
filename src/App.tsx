@@ -17,7 +17,6 @@ function App() {
         <div className="code">
           <CodeEditor
             initialValue={`import { greet } from 'hello'`}
-            language="typescript"
           />
         </div>
       </div>

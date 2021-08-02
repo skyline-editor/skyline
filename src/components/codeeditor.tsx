@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { Editor } from "../../editor/"
 import WebFont from 'webfontloader';
 
-const CodeEditor: React.FC<{ initialValue: string, language: string }> = ({ initialValue, language }) => {
+const CodeEditor: React.FC<{ initialValue: string }> = ({ initialValue }) => {
   const [editor, setEditor] = React.useState<Editor>(null);
   const canvas = React.useRef(null);
 
@@ -15,7 +15,11 @@ const CodeEditor: React.FC<{ initialValue: string, language: string }> = ({ init
       }
     });
 
-    const editor = new Editor(initialValue, language);
+    const editor = new Editor(initialValue);
+    editor.on('save', (_editor) => {
+      console.log(editor.code);
+    });
+    
     setEditor(editor);
   }, []);
 
