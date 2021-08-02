@@ -16,7 +16,9 @@
       "identifier": "com.tauri.dev",
       "icon": [
         "icons/logo32.png",
-        "icons/logo128.png"
+        "icons/logo128.png",
+        "icons/icon.png",
+        "icons/icon.ico"
       ],
       "resources": [],
       "externalBin": [],
