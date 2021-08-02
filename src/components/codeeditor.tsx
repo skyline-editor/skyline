@@ -2,6 +2,7 @@ import React from 'react'
 import { useEffect } from 'react'
 import { Editor } from '../../editor/'
 import WebFont from 'webfontloader'
+import typescript from '@skyline-editor/language-typescript';
 
 const CodeEditor: React.FC<{ initialValue: string }> = ({ initialValue }) => {
   const [editor, setEditor] = React.useState<Editor>(null)
@@ -16,6 +17,7 @@ const CodeEditor: React.FC<{ initialValue: string }> = ({ initialValue }) => {
     })
 
     const editor = new Editor(initialValue)
+    editor.language = typescript;
 
     editor.on('save', (_editor) => {
       console.log(editor.code)
