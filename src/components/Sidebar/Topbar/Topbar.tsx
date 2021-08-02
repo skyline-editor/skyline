@@ -1,11 +1,11 @@
 // Styles
-import styles from "./Topbar.module.css";
+import styles from './Topbar.module.css'
 
 // icons
-import folder_blue from "../../../icons/folder_blue.svg";
-import search from "../../../icons/search.svg";
-import git from "../../../icons/git.svg";
-import extension from "../../../icons/extension.svg";
+import folder_blue from '../../../icons/folder_blue.svg'
+import search from '../../../icons/search.svg'
+import git from '../../../icons/git.svg'
+import extension from '../../../icons/extension.svg'
 
 const Topbar = () => {
   return (
@@ -15,7 +15,7 @@ const Topbar = () => {
       <img src={git} alt="Git" />
       <img src={extension} alt="Extensions" />
     </div>
-  );
-};
+  )
+}
 
-export default Topbar;
+export default Topbar
