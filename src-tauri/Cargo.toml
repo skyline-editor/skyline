@@ -17,7 +17,7 @@ tauri-build = { version = "1.0.0-beta.3" }
 [dependencies]
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "1.0.0-beta.5", features = ["api-all"] }
+tauri = { version = "1.0.0-beta.5", features = ["fs-copy-file", "fs-create-dir", "fs-read-binary-file", "fs-read-dir", "fs-read-text-file", "fs-remove-dir", "fs-remove-file", "fs-rename-file", "fs-write-binary-file", "fs-write-file"] }
 
 [features]
 default = ["custom-protocol"]

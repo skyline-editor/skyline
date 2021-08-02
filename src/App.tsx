@@ -1,9 +1,9 @@
 // Styles
-import './App.css'
+import './App.css';
 
 // Components
-import CodeEditor from './components/codeeditor'
-import Sidebar from './components/Sidebar/Sidebar'
+import CodeEditor from './components/codeeditor';
+import Sidebar from './components/Sidebar/Sidebar';
 
 function App() {
   return (
@@ -19,7 +19,7 @@ function App() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

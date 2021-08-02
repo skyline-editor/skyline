@@ -48,7 +48,18 @@
       "active": false
     },
     "allowlist": {
-      "all": true
+      "fs": {
+        "readTextFile": true,
+        "readBinaryFile": true,
+        "writeFile": true,
+        "writeBinaryFile": true,
+        "readDir": true,
+        "copyFile": true,
+        "createDir": true,
+        "removeDir": true,
+        "removeFile": true,
+        "renameFile": true
+      }
     },
     "windows": [
       {

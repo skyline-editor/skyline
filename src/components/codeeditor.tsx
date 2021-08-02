@@ -1,11 +1,12 @@
-import React from 'react'
-import { useEffect } from 'react'
-import { Editor } from '../../editor/'
-import WebFont from 'webfontloader'
+import React from 'react';
+import { useEffect } from 'react';
+import { Editor } from '../../editor/';
+import WebFont from 'webfontloader';
+import FileSystem from '../model/FileSystem';
 
 const CodeEditor: React.FC<{ initialValue: string }> = ({ initialValue }) => {
-  const [editor, setEditor] = React.useState<Editor>(null)
-  const canvas = React.useRef(null)
+  const [editor, setEditor] = React.useState<Editor>(null);
+  const canvas = React.useRef(null);
 
   useEffect(() => {
     WebFont.load({
@@ -13,25 +14,26 @@ const CodeEditor: React.FC<{ initialValue: string }> = ({ initialValue }) => {
         families: ['consolas'],
         urls: ['/src/consolas.woff'],
       },
-    })
+    });
 
-    const editor = new Editor(initialValue)
+    const editor = new Editor(initialValue);
+    const fileSystem = new FileSystem();
 
-    editor.on('save', (_editor) => {
-      console.log(editor.code)
-    })
+    editor.on('save', (editor) => {
+      fileSystem.writeFile('greet.js', editor.code);
+    });
 
-    setEditor(editor)
-  }, [])
+    setEditor(editor);
+  }, []);
 
   useEffect(() => {
-    if (!editor) return
-    if (!canvas) return
+    if (!editor) return;
+    if (!canvas) return;
 
-    editor.mount(canvas.current)
-  }, [editor, canvas])
+    editor.mount(canvas.current);
+  }, [editor, canvas]);
 
-  console.log(editor)
+  console.log(editor);
 
   return (
     <canvas
@@ -45,7 +47,7 @@ const CodeEditor: React.FC<{ initialValue: string }> = ({ initialValue }) => {
       }}
       ref={canvas}
     />
-  )
-}
+  );
+};
 
-export default CodeEditor
+export default CodeEditor;
