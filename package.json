@@ -1,56 +1,49 @@
 {
-  "name": "skyline",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "@codemirror/basic-setup": "^0.18.2",
-    "@codemirror/lang-markdown": "^0.18.4",
-    "@codemirror/lang-python": "^0.18.1",
-    "@codemirror/state": "^0.18.7",
-    "@codemirror/theme-one-dark": "^0.18.1",
-    "@codemirror/view": "^0.18.19",
-    "@ddietr/codemirror-themes": "^1.0.2",
-    "@tauri-apps/api": "^1.0.0-beta.5",
-    "@testing-library/jest-dom": "^5.11.4",
-    "@testing-library/react": "^11.1.0",
-    "@testing-library/user-event": "^12.1.10",
-    "@types/jest": "^26.0.24",
-    "@types/node": "^16.4.10",
-    "@types/react": "^17.0.15",
-    "@types/react-dom": "^17.0.9",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-scripts": "4.0.3",
-    "skyline-editor": "0.0.7",
-    "typescript": "^4.3.5",
-    "web-vitals": "^1.0.1",
-    "webfontloader": "^1.6.28"
-  },
-  "devDependencies": {
-    "@tauri-apps/cli": "^1.0.0-beta.6"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  }
+    "name": "skyline",
+    "version": "0.1.0",
+    "private": true,
+    "dependencies": {
+        "@tauri-apps/api": "^1.0.0-beta.5",
+        "react": "^17.0.2",
+        "react-dom": "^17.0.2",
+        "react-scripts": "4.0.3",
+        "skyline-editor": "0.0.7",
+        "typescript": "^4.3.5",
+        "web-vitals": "^1.0.1",
+        "webfontloader": "^1.6.28"
+    },
+    "devDependencies": {
+        "@tauri-apps/cli": "^1.0.0-beta.6",
+        "@testing-library/jest-dom": "^5.11.4",
+        "@testing-library/react": "^11.1.0",
+        "@testing-library/user-event": "^12.1.10",
+        "@types/jest": "^26.0.24",
+        "@types/node": "^16.4.10",
+        "@types/react": "^17.0.15",
+        "@types/react-dom": "^17.0.9"
+    },
+    "scripts": {
+        "start": "react-scripts start",
+        "build": "react-scripts build",
+        "test": "react-scripts test",
+        "eject": "react-scripts eject"
+    },
+    "eslintConfig": {
+        "extends": [
+            "react-app",
+            "react-app/jest"
+        ]
+    },
+    "browserslist": {
+        "production": [
+            ">0.2%",
+            "not dead",
+            "not op_mini all"
+        ],
+        "development": [
+            "last 1 chrome version",
+            "last 1 firefox version",
+            "last 1 safari version"
+        ]
+    }
 }
