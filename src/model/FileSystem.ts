@@ -1,29 +1,71 @@
-/*
-    Copyright 2021 Tejas Ravishankar, Eliyah Sundström, Pranav Doshi
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-        http://www.apache.org/licenses/LICENSE-2.0
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-*/
+import { fs } from '@tauri-apps/api';
+import { invoke } from '@tauri-apps/api/tauri';
 
-// TODO: implement FileSystem
 export default class FileSystem {
-  async listFiles(path: string): Promise<string[]> {
-    return [];
+  listFiles(path: string): Promise<string[]> {
+    return fs.readDir(path).then((files) => {
+      const paths = new Array<string>(files.length);
+      for (let i = 0; i < files.length; i++) {
+        paths[i] = files[i].path;
+      }
+
+      return paths;
+    });
   }
 
-  async readTextFile(path: string): Promise<string> {
-    return '';
+  readTextFile(path: string): Promise<string> {
+    return fs.readTextFile(path).then((text) => text ?? '');
   }
 
-  async renameFile(path: string, new_path: string): Promise<void> {}
+  renameFile(path: string, new_path: string): Promise<void> {
+    return fs
+      .renameFile(path, new_path)
+      .then((_) => null)
+      .catch((err) => err);
+  }
 
-  async removeFile(path: string): Promise<void> {}
+  removeFile(path: string): Promise<void> {
+    return fs
+      .removeFile(path)
+      .then((_) => null)
+      .catch((err) => err);
+  }
 
-  async writeFile(path: string, content: string): Promise<void> {}
+  writeFile(path: string, content: string): Promise<void> {
+    // todo, only append extra changes to the file
+    return fs
+      .writeFile({
+        path: path,
+        contents: content,
+      })
+      .then((_) => null)
+      .catch((err) => err);
+  }
+
+  copyFile(source: string, destination: string): Promise<void> {
+    return fs
+      .copyFile(source, destination)
+      .then((_) => null)
+      .catch((err) => err);
+  }
+
+  createDirectory(path: string): Promise<void> {
+    return fs
+      .createDir(path)
+      .then((_) => null)
+      .catch((err) => err);
+  }
+
+  removeDirectory(path: string): Promise<void> {
+    return fs
+      .removeDir(path)
+      .then((_) => null)
+      .catch((err) => err);
+  }
+
+  removeDirectoryRecursive(path: string): Promise<void> {
+    return invoke('remove_dir_recursive')
+      .then(() => null)
+      .catch((error) => error);
+  }
 }
