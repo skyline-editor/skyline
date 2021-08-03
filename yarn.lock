@@ -1494,6 +1494,11 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
+"@skyline-editor/language-typescript@0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@skyline-editor/language-typescript/-/language-typescript-0.0.1.tgz#cacce83f1dee84d0069691b310c66a549a81dafa"
+  integrity sha512-35bPpJYtV4PndbTTFZFoa2vYmrBTvwReJrqV4Xbyll8Wh6pDogNhrD5K8jAKeYGhG7J+9V66XyceDTBZDAIvDA==
+
 "@surma/rollup-plugin-off-main-thread@^1.1.1":
   version "1.4.2"
   resolved "https://registry.yarnpkg.com/@surma/rollup-plugin-off-main-thread/-/rollup-plugin-off-main-thread-1.4.2.tgz#e6786b6af5799f82f7ab3a82e53f6182d2b91a58"
