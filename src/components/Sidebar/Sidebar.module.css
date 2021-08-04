@@ -4,8 +4,8 @@
   align-items: flex-start;
   background-color: #1c1e26;
   width: 23%;
-  height: 100%;
+  height: calc(100% - 30px);
   position: absolute;
   left: 0;
-  top: 0;
+  top: 30px;
 }

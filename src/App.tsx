@@ -4,6 +4,7 @@ import './App.css';
 // Components
 import CodeEditor from './components/codeeditor';
 import Sidebar from './components/Sidebar/Sidebar';
+import Titlebar from './components/Titlebar/Titlebar';
 
 function App() {
   return (
@@ -11,6 +12,10 @@ function App() {
       <header>
         <title>Skyline Editor</title>
       </header>
+
+      {/* Title bar */}
+      <Titlebar />
+
       {/* Code Editor */}
       <div className="editor">
         <Sidebar />
