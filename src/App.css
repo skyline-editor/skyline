@@ -26,7 +26,7 @@
   justify-content: center;
   align-items: flex-start;
   width: 77%;
-  height: 100%;
+  height: calc(100% - 30px);
   position: absolute;
   border-left: 4px solid #2d3041;
   right: 0;
@@ -35,7 +35,7 @@
 
 .titlebar {
   height: 30px;
-  background: #329ea3;
+  background: #1c1e26;
   user-select: none;
   display: flex;
   justify-content: flex-end;
@@ -51,6 +51,7 @@
   align-items: center;
   width: 30px;
   height: 30px;
+  color: white;
 }
 
 .titlebar-button:hover {
