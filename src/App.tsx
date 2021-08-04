@@ -4,6 +4,7 @@ import './App.css';
 // Components
 import CodeEditor from './components/codeeditor';
 import Sidebar from './components/Sidebar/Sidebar';
+import Titlebar from './components/Titlebar/Titlebar';
 
 function App() {
   return (
@@ -13,17 +14,7 @@ function App() {
       </header>
 
       {/* Title bar */}
-      <div data-tauri-drag-region className="titlebar">
-        <div className="titlebar-button" id="titlebar-minimize">
-          <img src="/titlebar/minimize.svg" alt="minimize" />
-        </div>
-        <div className="titlebar-button" id="titlebar-maximize">
-          <img src="/titlebar/maximize.svg" alt="maximize" />
-        </div>
-        <div className="titlebar-button" id="titlebar-close">
-          <img src="/titlebar/close.svg" alt="close" />
-        </div>
-      </div>
+      <Titlebar />
 
       {/* Code Editor */}
       <div className="editor">
