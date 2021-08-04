@@ -10,12 +10,12 @@ const CodeEditor: React.FC<{ initialValue: string }> = ({ initialValue }) => {
   const canvas = React.useRef(null);
 
   useEffect(() => {
-    WebFont.load({
-      custom: {
-        families: ['consolas'],
-        urls: ['/src/consolas.woff'],
-      },
-    });
+    // WebFont.load({
+    //   custom: {
+    //     families: ['consolas'],
+    //     urls: ['/src/consolas.woff'],
+    //   },
+    // });
 
     const fileSystem = new FileSystem();
 
