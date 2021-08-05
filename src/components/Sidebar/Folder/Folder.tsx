@@ -3,20 +3,19 @@ import styles from './Folder.module.css';
 
 // Icons
 import folder_yellow from '../../../icons/folder_yellow.svg';
-import arrow_right from '../../../icons/arrow_right.svg';
-import arrow_down from '../../../icons/arrow_down.svg';
 
 // React
-import { useState, useEffect } from 'react';
-import { appWindow } from '@tauri-apps/api/window';
+import { useState } from 'react';
 
 // Folder Properties
 interface FolderProps {
   folderName: string;
   expanded: boolean;
+  index: number;
+  parent: string;
 }
 
-const Folder = ({ folderName, expanded }: FolderProps) => {
+const Folder = ({ folderName, expanded, index, parent }: FolderProps) => {
   const [isExpanded, setIsExpanded] = useState(expanded);
 
   return (

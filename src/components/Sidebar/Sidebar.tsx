@@ -13,8 +13,13 @@ const Sidebar = () => {
       <Topbar />
       <div className={styles.directoryName}>{direcoryName}</div>
       <div className={styles.differentiator}></div>
-      <Folder folderName="components" expanded={false} />
-      <Folder folderName="pages" expanded={true} />
+      <Folder
+        folderName="components"
+        expanded={false}
+        index={0}
+        parent="root"
+      />
+      {/* <Folder folderName="pages" expanded={true} /> */}
     </div>
   );
 };
