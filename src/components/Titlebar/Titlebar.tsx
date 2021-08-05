@@ -1,10 +1,19 @@
 // Styles
 import styles from './Titlebar.module.css';
 
-// App windows
+// App window
 import { appWindow } from '@tauri-apps/api/window';
 
+// React
+import React, { useEffect } from 'react';
+
 const Titlebar = () => {
+  useEffect(() => {
+    appWindow.setResizable(true);
+    appWindow.setSize({ width: 800, height: 600, type: 'Physical' });
+    appWindow.setFullscreen(false);
+  }, []);
+
   return (
     <div data-tauri-drag-region className={styles.titlebar}>
       <div
