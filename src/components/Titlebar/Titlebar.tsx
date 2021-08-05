@@ -5,13 +5,16 @@ import styles from './Titlebar.module.css';
 import { appWindow } from '@tauri-apps/api/window';
 
 // React
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
 const Titlebar = () => {
+  // TODO: Remove tauri default title bar
+
   useEffect(() => {
     appWindow.setResizable(true);
     appWindow.setSize({ width: 800, height: 600, type: 'Physical' });
     appWindow.setFullscreen(false);
+    appWindow.setTitle('Skyline Editor');
   }, []);
 
   return (
