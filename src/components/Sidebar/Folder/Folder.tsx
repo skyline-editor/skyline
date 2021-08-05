@@ -9,13 +9,14 @@ import { useState } from 'react';
 
 // Folder Properties
 interface FolderProps {
+  id: string;
   folderName: string;
   expanded: boolean;
   index: number;
   parent: string;
 }
 
-const Folder = ({ folderName, expanded, index, parent }: FolderProps) => {
+const Folder = ({ id, folderName, expanded, index, parent }: FolderProps) => {
   const [isExpanded, setIsExpanded] = useState(expanded);
 
   return (

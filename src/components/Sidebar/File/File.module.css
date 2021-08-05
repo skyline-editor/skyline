@@ -1,0 +1,29 @@
+.file {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-left: 2rem;
+  margin-top: 0.6rem;
+}
+
+.arrow {
+  width: 1.5rem;
+  height: 1.5rem;
+  cursor: pointer;
+  outline: none;
+  border: none;
+}
+
+.icon {
+  width: 1.5rem;
+  margin-left: 0.3rem;
+  margin-top: 0.4rem;
+}
+
+.fileName {
+  color: #b9e2ff;
+  font-size: 18px;
+  font-weight: 400;
+  margin: 0;
+  margin-left: 0.7rem;
+}
