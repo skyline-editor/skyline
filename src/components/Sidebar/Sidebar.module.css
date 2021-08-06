@@ -5,10 +5,10 @@
   flex-direction: column;
   background-color: #1c1e26;
   width: 23%;
-  height: calc(100% - 30px);
+  height: 100%;
   position: absolute;
   left: 0;
-  top: 30px;
+  top: 0px;
 }
 
 .directoryName {

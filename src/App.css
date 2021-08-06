@@ -12,7 +12,7 @@
   justify-content: center;
   align-items: flex-start;
   width: 100%;
-  height: calc(100% - 30px);
+  height: 100%;
 }
 
 .code {
@@ -20,9 +20,9 @@
   justify-content: center;
   align-items: flex-start;
   width: 77%;
-  height: calc(100% - 30px);
+  height: 100%;
   position: absolute;
   border-left: 4px solid #2d3041;
   right: 0;
-  top: 30px;
+  top: 0px;
 }
