@@ -1,11 +1,28 @@
 .sidebar {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: flex-start;
+  flex-direction: column;
   background-color: #1c1e26;
   width: 23%;
-  height: 100%;
+  height: calc(100% - 30px);
   position: absolute;
   left: 0;
-  top: 0;
+  top: 30px;
+}
+
+.directoryName {
+  color: #b9e2ff;
+  font-size: 20px;
+  margin-top: 0.8rem;
+  margin-bottom: 0.8rem;
+  margin-left: 2rem;
+  font-weight: 500;
+}
+
+.differentiator {
+  height: 1px;
+  background: #2d3041;
+  width: 100%;
+  margin-bottom: 0.5rem;
 }

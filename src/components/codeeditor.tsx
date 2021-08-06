@@ -1,7 +1,7 @@
-import React from 'react'
-import { useEffect } from 'react'
-import { Editor } from '../../editor/'
-import WebFont from 'webfontloader'
+import React from 'react';
+import { useEffect } from 'react';
+import { Editor } from '../../editor/';
+import WebFont from 'webfontloader';
 import typescript from '@skyline-editor/language-typescript';
 import FileSystem from '../model/FileSystem';
 
@@ -10,16 +10,16 @@ const CodeEditor: React.FC<{ initialValue: string }> = ({ initialValue }) => {
   const canvas = React.useRef(null);
 
   useEffect(() => {
-    WebFont.load({
-      custom: {
-        families: ['consolas'],
-        urls: ['/src/consolas.woff'],
-      },
-    });
+    // WebFont.load({
+    //   custom: {
+    //     families: ['consolas'],
+    //     urls: ['/src/consolas.woff'],
+    //   },
+    // });
 
     const fileSystem = new FileSystem();
 
-    const editor = new Editor(initialValue)
+    const editor = new Editor(initialValue);
     editor.language = typescript;
 
     editor.on('save', (editor) => {
@@ -45,7 +45,6 @@ const CodeEditor: React.FC<{ initialValue: string }> = ({ initialValue }) => {
         width: '100%',
         height: '100%',
         background: '#1c1e26',
-
         cursor: 'text',
       }}
       ref={canvas}

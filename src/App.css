@@ -1,8 +1,3 @@
-@font-face {
-  font-family: 'Consolas';
-  src: url('./consolas.ttf');
-}
-
 .container {
   padding: 0 0.5rem;
   display: flex;
@@ -17,7 +12,7 @@
   justify-content: center;
   align-items: flex-start;
   width: 100%;
-  height: 100%;
+  height: calc(100% - 30px);
 }
 
 .code {
@@ -25,9 +20,9 @@
   justify-content: center;
   align-items: flex-start;
   width: 77%;
-  height: 100%;
+  height: calc(100% - 30px);
   position: absolute;
   border-left: 4px solid #2d3041;
   right: 0;
-  top: 0;
+  top: 30px;
 }
