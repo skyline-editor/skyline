@@ -5,11 +5,7 @@ import styles from './Folder.module.css';
 import folder_yellow from '../../../icons/folder_yellow.svg';
 
 // React
-import React, { useState } from 'react';
-
-// Context menu
-import { ContextMenuTrigger } from 'react-contextmenu';
-// import ContextMenu from './Contextmenu/Contextmenu';
+import React, { useState, useRef } from 'react';
 
 // Folder Properties
 interface FolderProps {
@@ -19,6 +15,7 @@ interface FolderProps {
   index: number;
   parent: string;
   setShowContextMenu: (arg: boolean) => void;
+  setContextType: (arg: string) => void;
   setContextX: (arg: number) => void;
   setContextY: (arg: number) => void;
 }
@@ -30,6 +27,7 @@ const Folder = ({
   index,
   parent,
   setShowContextMenu,
+  setContextType,
   setContextX,
   setContextY,
 }: FolderProps) => {
@@ -37,7 +35,7 @@ const Folder = ({
 
   const marginLeft = index * 2 + 0.5 + 'rem';
 
-  const folderRef = React.useRef(null);
+  const folderRef = useRef(null);
 
   return (
     <>
@@ -47,10 +45,7 @@ const Folder = ({
         style={{ marginLeft: marginLeft }}
         onContextMenu={(e) => {
           e.preventDefault();
-          console.log(
-            'show context menu for folder: ',
-            folderRef.current.getBoundingClientRect().top
-          );
+          setContextType('folder');
           setContextX(folderRef.current.getBoundingClientRect().left + 55);
           setContextY(folderRef.current.getBoundingClientRect().top + 30);
           setShowContextMenu(true);

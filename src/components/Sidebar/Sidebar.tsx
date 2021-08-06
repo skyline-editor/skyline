@@ -43,15 +43,20 @@ const Sidebar = () => {
         index={0}
         parent="root"
         setShowContextMenu={setShowContextMenu}
+        setContextType={setContextType}
         setContextX={setContextX}
         setContextY={setContextY}
       />
-      {/* <File
+      <File
         path="/components/index.ts"
         fileName="index.ts"
         index={1}
         parent="components"
-      /> */}
+        setShowContextMenu={setShowContextMenu}
+        setContextType={setContextType}
+        setContextX={setContextX}
+        setContextY={setContextY}
+      />
       {/* <Folder
         path="/pages"
         folderName="pages"
