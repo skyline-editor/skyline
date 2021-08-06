@@ -13,7 +13,7 @@ interface FileProps {
 }
 
 const File = ({ path, fileName, index, parent }: FileProps) => {
-  const marginLeft = index * 2.5 + 0.5 + 'rem';
+  const marginLeft = index * 2 + 2 + 'rem';
 
   return (
     <div className={styles.file} style={{ marginLeft: marginLeft }}>

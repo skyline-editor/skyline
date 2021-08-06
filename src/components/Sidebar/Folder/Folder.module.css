@@ -3,6 +3,7 @@
   justify-content: flex-start;
   align-items: center;
   margin-top: 0.6rem;
+  cursor: pointer;
 }
 
 .arrow {
@@ -24,4 +25,8 @@
   font-weight: 400;
   margin: 0;
   margin-left: 0.7rem;
+}
+
+.contextmenu {
+  background: white;
 }
