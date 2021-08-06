@@ -9,18 +9,20 @@ import { useState } from 'react';
 
 // Folder Properties
 interface FolderProps {
-  id: string;
+  path: string;
   folderName: string;
   expanded: boolean;
   index: number;
   parent: string;
 }
 
-const Folder = ({ id, folderName, expanded, index, parent }: FolderProps) => {
+const Folder = ({ path, folderName, expanded, index, parent }: FolderProps) => {
   const [isExpanded, setIsExpanded] = useState(expanded);
 
+  const marginLeft = index * 2.5 + 0.5 + 'rem';
+
   return (
-    <div className={styles.folder}>
+    <div className={styles.folder} style={{ marginLeft: marginLeft }}>
       <div
         className={styles.arrow}
         style={{

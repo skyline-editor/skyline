@@ -15,14 +15,25 @@ const Sidebar = () => {
       <div className={styles.directoryName}>{direcoryName}</div>
       <div className={styles.differentiator}></div>
       <Folder
-        id="components"
+        path="/components"
         folderName="components"
         expanded={false}
         index={0}
         parent="root"
       />
-      <File id="index.ts" fileName="index.ts" index={1} parent="components" />
-      {/* <Folder folderName="pages" expanded={true} /> */}
+      <File
+        path="/components/index.ts"
+        fileName="index.ts"
+        index={1}
+        parent="components"
+      />
+      <Folder
+        path="/pages"
+        folderName="pages"
+        expanded={true}
+        index={0}
+        parent="root"
+      />
     </div>
   );
 };
