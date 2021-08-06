@@ -14,7 +14,7 @@ function App() {
       </header>
 
       {/* Title bar */}
-      {/* <Titlebar /> */}
+      <Titlebar />
 
       {/* Code Editor */}
       <div className="editor">
