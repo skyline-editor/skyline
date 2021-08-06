@@ -8,12 +8,6 @@ const Contextmenu = () => {
   return (
     <ContextMenu id="contextmenu" className={styles.contextmenu}>
       <MenuItem>
-        <span>New File</span>
-      </MenuItem>
-      <MenuItem>
-        <span>New Folder</span>
-      </MenuItem>
-      <MenuItem>
         <span>Cut</span>
       </MenuItem>
       <MenuItem>
