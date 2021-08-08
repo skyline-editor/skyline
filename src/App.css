@@ -1,3 +1,8 @@
+@font-face {
+  font-family: 'consolas';
+  src: url(./consolas.ttf);
+}
+
 .container {
   padding: 0 0.5rem;
   display: flex;

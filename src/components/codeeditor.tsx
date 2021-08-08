@@ -13,7 +13,7 @@ const CodeEditor: React.FC<{ initialValue: string }> = ({ initialValue }) => {
     // WebFont.load({
     //   custom: {
     //     families: ['consolas'],
-    //     urls: ['/src/consolas.woff'],
+    //     urls: ['/src/consolas.tff'],
     //   },
     // });
 
